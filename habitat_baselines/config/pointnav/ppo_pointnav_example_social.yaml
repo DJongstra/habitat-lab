@@ -1,7 +1,7 @@
 # Note:  This is an example config, see habitat_baselines/config/pointnav/ppo_pointnav.yaml
 # for better hyperparameters for actual training
 
-BASE_TASK_CONFIG_PATH: "configs/tasks/pointnav.yaml"
+BASE_TASK_CONFIG_PATH: "configs/tasks/socialnav.yaml"
 TRAINER_NAME: "ppo"
 ENV_NAME: "NavRLEnv"
 SIMULATOR_GPU_ID: 0
@@ -24,6 +24,8 @@ NUM_CHECKPOINTS: 50
 FORCE_TORCH_SINGLE_THREADED: True
 
 RL:
+  POLICY:
+    action_distribution_type: "gaussian"
   PPO:
     # ppo params
     clip_param: 0.1
