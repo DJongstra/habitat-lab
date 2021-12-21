@@ -43,14 +43,17 @@ class iGibsonSocialNav(HabitatSim):
         super().__init__(config=config)
         obj_templates_mgr = self.get_object_template_manager()
         self.people_template_ids = obj_templates_mgr.load_configs(
-            "/private/home/naokiyokoyama/gc/datasets/person_meshes"
+            # For each object, an <object>.object_config.json file is required.
+            # See:https://aihabitat.org/docs/habitat-sim/attributesJSON.html#objectattributes
+            # for more information.
+            "data/objects/person_meshes/person_2/meshes"
         )
         self.person_ids = []
         self.people_mask = config.get('PEOPLE_MASK', False)
         self.num_people = config.get('NUM_PEOPLE', 1)
         self.social_nav = True
         self.interactive_nav = False
-        
+
         # People params
         self.people_mask = config.get('PEOPLE_MASK', False)
         self.lin_speed = config.PEOPLE_LIN_SPEED
