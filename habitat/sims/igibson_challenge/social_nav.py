@@ -110,7 +110,7 @@ class iGibsonSocialNav(HabitatSim):
             rotation = mn.Quaternion(
                 rotation.imag, rotation.real
             )
-            self.set_translation([start[0], start[1]+0.9, start[2]], person_id)
+            self.set_translation([start[0], start[1], start[2]], person_id)
             self.set_rotation(rotation, person_id)
             self.set_object_motion_type(
                 habitat_sim.physics.MotionType.KINEMATIC,
