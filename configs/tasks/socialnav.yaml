@@ -31,3 +31,8 @@ TASK:
     SUCCESS_DISTANCE: 0.2
 
   POSSIBLE_ACTIONS: ["VELOCITY_CONTROL"]
+
+DATASET:
+  TYPE: PointNav-v1
+  SPLIT: train
+  DATA_PATH: data/datasets/pointnav/room3x3/v0/{split}/{split}.json.gz
