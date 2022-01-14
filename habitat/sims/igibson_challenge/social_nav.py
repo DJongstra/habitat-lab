@@ -43,14 +43,19 @@ class iGibsonSocialNav(HabitatSim):
         super().__init__(config=config)
         obj_templates_mgr = self.get_object_template_manager()
         self.people_template_ids = obj_templates_mgr.load_configs(
-            "/private/home/naokiyokoyama/gc/datasets/person_meshes"
+            #"/private/home/naokiyokoyama/gc/datasets/person_meshes"
+            "/home/affiena/Experimental/habitat-lab/data/person_meshes"
         )
+        print(config)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print(self.people_template_ids)
         self.person_ids = []
         self.people_mask = config.get('PEOPLE_MASK', False)
         self.num_people = config.get('NUM_PEOPLE', 1)
+        print(self.num_people)
         self.social_nav = True
         self.interactive_nav = False
-        
+
         # People params
         self.people_mask = config.get('PEOPLE_MASK', False)
         self.lin_speed = config.PEOPLE_LIN_SPEED
