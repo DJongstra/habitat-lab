@@ -90,3 +90,5 @@ data
 
 tb/
 video_dir/
+
+wandb/

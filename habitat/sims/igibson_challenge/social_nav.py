@@ -43,7 +43,9 @@ class iGibsonSocialNav(HabitatSim):
         super().__init__(config=config)
         obj_templates_mgr = self.get_object_template_manager()
         self.people_template_ids = obj_templates_mgr.load_configs(
-            #"/private/home/naokiyokoyama/gc/datasets/person_meshes"
+            # For each object, an <object>.object_config.json file is required.
+            # See:https://aihabitat.org/docs/habitat-sim/attributesJSON.html#objectattributes
+            # for more information.
             "/home/affiena/Experimental/habitat-lab/data/person_meshes"
         )
         print(config)
@@ -112,7 +114,7 @@ class iGibsonSocialNav(HabitatSim):
             rotation = mn.Quaternion(
                 rotation.imag, rotation.real
             )
-            self.set_translation([start[0], start[1]+0.9, start[2]], person_id)
+            self.set_translation([start[0], start[1]+0.7, start[2]], person_id)
             self.set_rotation(rotation, person_id)
             self.set_object_motion_type(
                 habitat_sim.physics.MotionType.KINEMATIC,

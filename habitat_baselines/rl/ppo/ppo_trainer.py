@@ -59,6 +59,8 @@ from habitat_baselines.utils.common import (
 )
 from habitat_baselines.utils.env_utils import construct_envs
 
+# Logging using weights-and-biases
+import wandb
 
 @baseline_registry.register_trainer(name="ddppo")
 @baseline_registry.register_trainer(name="ppo")
@@ -716,6 +718,18 @@ class PPOTrainer(BaseRLTrainer):
             losses,
             self.num_steps_done,
         )
+
+        # Weights-and-biases logging.
+        log = {
+            "reward": deltas["reward"] / deltas["count"],
+            "update": self.num_updates_done,
+            "frames": self.num_steps_done,
+            "fps": self.num_steps_done/((time.time() - self.t_start) + prev_time)
+        }
+
+        log.update(metrics)
+        log.update( {k: l for k, l in losses.items()})
+        wandb.log(log)
 
         # log stats
         if self.num_updates_done % self.config.LOG_INTERVAL == 0:
