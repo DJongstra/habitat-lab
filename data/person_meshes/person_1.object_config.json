@@ -1,0 +1,5 @@
+{
+    "render_asset": "person_1/meshes/person.obj",
+    "collision_asset": "person_1/meshes/person_vhacd.obj",
+    "join_collision_meshes": false
+}

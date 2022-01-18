@@ -42,19 +42,18 @@ class iGibsonSocialNav(HabitatSim):
     def __init__(self, config: Config) -> None:
         super().__init__(config=config)
         obj_templates_mgr = self.get_object_template_manager()
-        self.people_template_ids = obj_templates_mgr.load_configs(
-            # For each object, an <object>.object_config.json file is required.
-            # See:https://aihabitat.org/docs/habitat-sim/attributesJSON.html#objectattributes
-            # for more information.
-            "/home/affiena/Experimental/habitat-lab/data/person_meshes"
-        )
-        print(config)
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        print(self.people_template_ids)
+        self.num_people = config.get('NUM_PEOPLE', 0)
+        self.people_template_ids = []
+        if (self.num_people > 0):   # load meshes of people if they are in the scene
+            self.people_template_ids = obj_templates_mgr.load_configs(
+                # For each object, an <object>.object_config.json file is required.
+                # See:https://aihabitat.org/docs/habitat-sim/attributesJSON.html#objectattributes
+                # for more information.
+                "./data/person_meshes"
+            )
         self.person_ids = []
         self.people_mask = config.get('PEOPLE_MASK', False)
         self.num_people = config.get('NUM_PEOPLE', 1)
-        print(self.num_people)
         self.social_nav = True
         self.interactive_nav = False
 

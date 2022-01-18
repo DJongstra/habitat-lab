@@ -6,13 +6,14 @@ SIMULATOR:
     SENSORS: ['RGB_SENSOR']
   HABITAT_SIM_V0:
     GPU_DEVICE_ID: 0
+    ALLOW_SLIDING: True # True or False
   RGB_SENSOR:
     WIDTH: 256
     HEIGHT: 256
   DEPTH_SENSOR:
     WIDTH: 256
     HEIGHT: 256
-  NUM_PEOPLE: 0
+  NUM_PEOPLE: 0 # set to number greater than 1 to generate people in scene
   PEOPLE_LIN_SPEED: 0.25
   PEOPLE_ANG_SPEED: 10.0
   TIME_STEP: 1.0
@@ -30,7 +31,7 @@ TASK:
   SUCCESS:
     SUCCESS_DISTANCE: 0.2
 
-  POSSIBLE_ACTIONS: ["VELOCITY_CONTROL"]
+  #POSSIBLE_ACTIONS: ["VELOCITY_CONTROL"] # this is automatically set for gaussian action distribution.
 
 DATASET:
   TYPE: PointNav-v1

@@ -1,4 +1,4 @@
-BASE_TASK_CONFIG_PATH: "configs/tasks/socialnav.yaml"
+BASE_TASK_CONFIG_PATH: "configs/tasks/room3x3.yaml"
 
 ENV_NAME: "NavRLEnv"
 
@@ -8,7 +8,7 @@ SENSORS: ["DEPTH_SENSOR"]
 # General training options.
 TRAINER_NAME: "ddppo"
 NUM_UPDATES: 10000
-NUM_PROCESSES: 1
+NUM_ENVIRONMENTS: 4
 
 # TODO: Multiple processes: split dataset, scenes hack, ... ?
 
@@ -17,13 +17,12 @@ SIMULATOR_GPU_ID: 0
 TORCH_GPU_ID: 0
 
 # Training and evaluation run outputs.
-LOG_FILE: "ddppo_pointnav_socialnav.log"
+LOG_FILE: "ddppo_pointnav_room3x3.log"
 TENSORBOARD_DIR: "tb"
 
 # Training run logging and checkpoint options.
 LOG_INTERVAL: 10
 CHECKPOINT_INTERVAL: 250
-NUM_CHECKPOINTS: -1
 CHECKPOINT_FOLDER: "checkpoints"
 
 # Evaluation run options.
@@ -48,16 +47,12 @@ RL:
 
   POLICY:
     name: "PointNavResNetPolicy"
-    # options:
-    #	"gaussian": continuous actions
-    #	"categorical": discrete actions
-    action_distribution_type: "categorical"
 
   PPO:
     # ppo params
     clip_param: 0.2
     ppo_epoch: 2
-    num_mini_batch: 1
+    num_mini_batch: 2
     value_loss_coef: 0.5
     entropy_coef: 0.01
     lr: 2.5e-4

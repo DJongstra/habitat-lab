@@ -1,23 +1,53 @@
-FROM registry.gitlab.com/uantwerp/student/researchproject2021/office-simulator/embodied-docker:20210318-notebook
+# Base image
+FROM nvidia/cudagl:10.1-devel-ubuntu16.04
 
-# Wandb for custom logging in the cloud.
-RUN pip install wandb
+# Setup basic packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    curl \
+    vim \
+    ca-certificates \
+    libjpeg-dev \
+    libpng-dev \
+    libglfw3-dev \
+    libglm-dev \
+    libx11-dev \
+    libomp-dev \
+    libegl1-mesa-dev \
+    pkg-config \
+    wget \
+    zip \
+    unzip &&\
+    rm -rf /var/lib/apt/lists/*
 
-# Remove default habitat-lab from base image.
-RUN rm -r /habitat-lab
+# Install conda
+RUN curl -L -o ~/miniconda.sh -O  https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh  &&\
+    chmod +x ~/miniconda.sh &&\
+    ~/miniconda.sh -b -p /opt/conda &&\
+    rm ~/miniconda.sh &&\
+    /opt/conda/bin/conda install numpy pyyaml scipy ipython mkl mkl-include &&\
+    /opt/conda/bin/conda clean -ya
+ENV PATH /opt/conda/bin:$PATH
 
-RUN cd / &&\
-    git clone -b social_nav_v0 https://github.com/djongstra/habitat-lab.git
+# Install cmake
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0-Linux-x86_64.sh
+RUN mkdir /opt/cmake
+RUN sh /cmake-3.14.0-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
+RUN ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
+RUN cmake --version
 
-RUN cd /habitat-lab &&\
-    pip install -r requirements.txt --progress-bar off &&\
-    python setup.py develop --all
+# Conda environment
+RUN conda create -n habitat python=3.6 cmake=3.14.0
 
-# Add experiment scripts.
-ADD train.sh /
-ADD evaluation.sh /
+# Setup habitat-sim
+RUN git clone --branch stable https://github.com/facebookresearch/habitat-sim.git
+RUN /bin/bash -c ". activate habitat; cd habitat-sim; pip install -r requirements.txt; python setup.py install --headless"
 
-# Social navigation debug environment
-ADD configs/tasks/room3x3.yaml /habitat-lab/configs/tasks/
-ADD habitat_baselines/config/pointnav/ddppo_pointnav_social.yaml /habitat-lab/habitat_baselines/config/pointnav/
+# Install challenge specific habitat-lab
+RUN git clone --branch stable https://github.com/facebookresearch/habitat-lab.git
+RUN /bin/bash -c ". activate habitat; cd habitat-lab; pip install -e ."
 
+# Silence habitat-sim logs
+ENV GLOG_minloglevel=2
+ENV MAGNUM_LOG="quiet"
