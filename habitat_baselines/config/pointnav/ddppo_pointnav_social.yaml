@@ -10,7 +10,6 @@ TRAINER_NAME: "ddppo"
 NUM_UPDATES: 10000
 NUM_PROCESSES: 1
 
-# TODO: Multiple processes: split dataset, scenes hack, ... ?
 
 # GPU configuration for habitat-sim and PyTorch.
 SIMULATOR_GPU_ID: 0

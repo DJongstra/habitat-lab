@@ -92,3 +92,5 @@ tb/
 video_dir/
 
 wandb/
+
+generate_dataset.py

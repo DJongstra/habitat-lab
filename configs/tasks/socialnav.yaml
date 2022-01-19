@@ -13,7 +13,7 @@ SIMULATOR:
   DEPTH_SENSOR:
     WIDTH: 256
     HEIGHT: 256
-  NUM_PEOPLE: 0 # set to number greater than 1 to generate people in scene
+  NUM_PEOPLE: 0 # set to 1 or more to generate people in scene
   PEOPLE_LIN_SPEED: 0.25
   PEOPLE_ANG_SPEED: 10.0
   TIME_STEP: 1.0
@@ -31,7 +31,7 @@ TASK:
   SUCCESS:
     SUCCESS_DISTANCE: 0.2
 
-  #POSSIBLE_ACTIONS: ["VELOCITY_CONTROL"] # this is automatically set for gaussian action distribution.
+  #POSSIBLE_ACTIONS: ["VELOCITY_CONTROL"] # this is automatically set for gaussian action distribution in ppo_trainer.py when using gaussian action distribution. Needs to be set manually for using demo.py
 
 DATASET:
   TYPE: PointNav-v1

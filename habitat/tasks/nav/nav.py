@@ -1183,7 +1183,7 @@ class VelocityAction(SimulatorTaskAction):
             if self._sim.social_nav and self._sim.num_people > 0:
                 obj_templates_mgr = self._sim.get_object_template_manager()
                 self._sim.people_template_ids = obj_templates_mgr.load_configs(
-                    "./data/person_meshes"
+                    "./person_meshes"
                 )
                 self._sim.reset_people()
 
