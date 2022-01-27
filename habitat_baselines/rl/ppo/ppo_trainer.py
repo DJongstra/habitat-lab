@@ -1254,6 +1254,12 @@ class PPOTrainer(BaseRLTrainer):
         if len(metrics) > 0:
             writer.add_scalars("eval_metrics", metrics, step_id)
 
+        # Wandb logging.
+        log = {k: v for k, v in aggregated_stats.items()}
+        log["step"] = step_id
+        log["checkpoint"] = checkpoint_index
+        wandb.log(log)
+
         self.envs.close()
 
         # End the script when all checkpoints have been evaluated

@@ -7,7 +7,7 @@ SENSORS: ["DEPTH_SENSOR"]
 
 # General training options.
 TRAINER_NAME: "ddppo"
-NUM_UPDATES: 10
+NUM_UPDATES: 10000
 NUM_PROCESSES: 1
 
 
@@ -21,7 +21,7 @@ TENSORBOARD_DIR: "tb"
 
 # Training run logging and checkpoint options.
 LOG_INTERVAL: 10
-CHECKPOINT_INTERVAL: 1
+CHECKPOINT_INTERVAL: 250
 NUM_CHECKPOINTS: -1
 CHECKPOINT_FOLDER: "checkpoints"
 
@@ -37,7 +37,7 @@ CHECKPOINT_FOLDER: "checkpoints"
 # Notes:
 #     - The "tensorboard" option uses a lot of disk space (uncompressed video?).
 #     - Video options are case sensitive, i.e., "DISK" will not work, whereas "disk" will work.
-VIDEO_OPTION: ["disk"]
+VIDEO_OPTION: []
 TEST_EPISODE_COUNT: -1
 VIDEO_DIR: "videos"
 EVAL_CKPT_PATH_DIR: "checkpoints"
