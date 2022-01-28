@@ -278,6 +278,15 @@ def poll_checkpoint_folder(
     #     exit()
     # return None
 
+def get_checkpoint_paths(checkpoint_folder: str):
+    assert os.path.isdir(checkpoint_folder), (
+        f"invalid checkpoint folder " f"path {checkpoint_folder}"
+    )
+    models_paths = list(
+        filter(os.path.isfile, glob.glob(checkpoint_folder + "/*"))
+    )
+    models_paths.sort(key=get_checkpoint_id)
+    return models_paths
 
 def generate_video(
     video_option: List[str],
