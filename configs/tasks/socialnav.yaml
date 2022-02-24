@@ -14,8 +14,9 @@ SIMULATOR:
     WIDTH: 256
     HEIGHT: 256
   NUM_PEOPLE: 0 # set to 1 or more to generate people in scene
-  PEOPLE_LIN_SPEED: 0.25
-  PEOPLE_ANG_SPEED: 10.0
+  NUM_OBJECTS: 1
+  PEOPLE_LIN_SPEED: 0.0 # both people speeds need to be set to zero to have a non-moving human
+  PEOPLE_ANG_SPEED: 0.0
   TIME_STEP: 1.0
 TASK:
   TYPE: SocialNav-v0
@@ -28,11 +29,11 @@ TASK:
   GOAL_SENSOR_UUID: pointgoal_with_gps_compass
 
  # Adding the SOCIAL_TOP_DOWN_MAP measurement slows down training significantly
-  MEASUREMENTS: ['DISTANCE_TO_GOAL', 'SUCCESS', 'SPL', 'SOCIAL_TOP_DOWN_MAP', 'HUMAN_COLLISION']
+  MEASUREMENTS: ['DISTANCE_TO_GOAL', 'SUCCESS', 'SPL', 'SOCIAL_TOP_DOWN_MAP', 'HUMAN_COLLISION', 'PEOPLE_POSITIONING', 'OBJECT_DISTANCE']
   SUCCESS:
     SUCCESS_DISTANCE: 0.2
 
-  #POSSIBLE_ACTIONS: ["VELOCITY_CONTROL"] # this is automatically set for gaussian action distribution in ppo_trainer.py when using gaussian action distribution. Needs to be set manually for using demo.py
+  POSSIBLE_ACTIONS: ["VELOCITY_CONTROL"] # this is automatically set for gaussian action distribution in ppo_trainer.py when using gaussian action distribution. Needs to be set manually for using demo.py
 
 DATASET:
   TYPE: PointNav-v1

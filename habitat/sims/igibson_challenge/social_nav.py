@@ -44,13 +44,14 @@ class iGibsonSocialNav(HabitatSim):
         obj_templates_mgr = self.get_object_template_manager()
         self.num_people = config.get('NUM_PEOPLE', 0)
         self.people_template_ids = []
-        if (self.num_people > 0):   # load meshes of people if they are in the scene
-            self.people_template_ids = obj_templates_mgr.load_configs(
-                # For each object, an <object>.object_config.json file is required.
-                # See:https://aihabitat.org/docs/habitat-sim/attributesJSON.html#objectattributes
-                # for more information.
-                "./person_meshes"
-            )
+        self.people_template_ids = obj_templates_mgr.load_configs(
+            # For each object, an <object>.object_config.json file is required.
+            # See:https://aihabitat.org/docs/habitat-sim/attributesJSON.html#objectattributes
+            # for more information.
+            "./person_meshes"
+        )
+
+        self.obj_template_ids = obj_templates_mgr.load_configs("./data/objects/simple_objects")
         self.person_ids = []
         self.people_mask = config.get('PEOPLE_MASK', False)
         self.num_people = config.get('NUM_PEOPLE', 1)
@@ -63,17 +64,50 @@ class iGibsonSocialNav(HabitatSim):
         self.ang_speed = np.deg2rad(config.PEOPLE_ANG_SPEED)
         self.time_step = config.TIME_STEP
 
+        # Objects
+        self.objects = []
+        self.num_objects = config.get('NUM_OBJECTS', 10)
+
 
     def reset_people(self):
         agent_position = self.get_agent_state().position
         obj_templates_mgr = self.get_object_template_manager()
 
+        for inst in self.get_existing_object_ids():
+            self.remove_object(inst)
+
         # Check if humans have been erased (sim was reset)
         if not self.get_existing_object_ids():
             self.person_ids = []
-            for _ in range(self.num_people):
-                for person_template_id in self.people_template_ids:
-                    self.person_ids.append(self.add_object(person_template_id))
+            people_count = 0
+            first_person = np.random.randint(0, len(self.people_template_ids))
+            while people_count < self.num_people:
+                self.person_ids.append(self.add_object(
+                    self.people_template_ids[
+                        (people_count + first_person) % len(
+                            self.people_template_ids)]))
+                people_count += 1
+
+        #spawn objects
+        self.objects = []
+        obj_count = 0
+        first_object = np.random.randint(0, len(self.obj_template_ids))
+        while obj_count < self.num_objects:
+            obj = self.add_object(self.obj_template_ids[(obj_count+first_object)%len(self.obj_template_ids)])
+            start = np.array(self.sample_navigable_point())
+            self.set_translation([start[0], start[1], start[2]], obj)
+            self.set_object_motion_type(
+                habitat_sim.physics.MotionType.STATIC,
+                obj
+            )
+            self.objects.append(obj)
+            obj_count += 1
+
+        navmesh_settings = habitat_sim.NavMeshSettings()
+        navmesh_settings.set_defaults()
+        navmesh_success = self.recompute_navmesh(
+            self.pathfinder, navmesh_settings, include_static_objects=True
+        )
 
         # Spawn humans
         min_path_dist = 3
@@ -106,14 +140,20 @@ class iGibsonSocialNav(HabitatSim):
                 if not valid_distance:
                     min_path_dist *= 0.95
 
-            waypoints = sp.points
-            heading = np.random.rand()*2*np.pi-np.pi
-            rotation = np.quaternion(np.cos(heading),0,np.sin(heading),0)
+            waypoints = []
+            if not (self.lin_speed == 0.0 and self.ang_speed == 0.0):
+                waypoints = sp.points
+            else:
+                waypoints = [sp.points[0]]
+
+            heading = np.random.rand() * 2 * np.pi - np.pi
+            rotation = np.quaternion(np.cos(heading), 0, np.sin(heading), 0)
             rotation = np.normalized(rotation)
             rotation = mn.Quaternion(
                 rotation.imag, rotation.real
             )
-            self.set_translation([start[0], start[1]+0.7, start[2]], person_id)
+
+            self.set_translation([start[0], start[1]+0.8, start[2]], person_id)
             self.set_rotation(rotation, person_id)
             self.set_object_motion_type(
                 habitat_sim.physics.MotionType.KINEMATIC,

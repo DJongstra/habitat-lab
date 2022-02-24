@@ -201,6 +201,16 @@ _C.TASK.HUMAN_COLLISION = CN()
 _C.TASK.HUMAN_COLLISION.TYPE = "HumanCollision"
 _C.TASK.HUMAN_COLLISION.TERMINATION_RADIUS = 0.3
 # -----------------------------------------------------------------------------
+# PEOPLE_DISTANCE MEASUREMENT
+# -----------------------------------------------------------------------------
+_C.TASK.PEOPLE_POSITIONING = CN()
+_C.TASK.PEOPLE_POSITIONING.TYPE = "PeoplePositioning"
+# -----------------------------------------------------------------------------
+# OBJECT_DISTANCE MEASUREMENT
+# -----------------------------------------------------------------------------
+_C.TASK.OBJECT_DISTANCE = CN()
+_C.TASK.OBJECT_DISTANCE.TYPE = "ObjectDistance"
+# -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 # # EQA TASK
 # -----------------------------------------------------------------------------
@@ -317,6 +327,7 @@ _C.SIMULATOR.NUM_PEOPLE = 1
 _C.SIMULATOR.PEOPLE_LIN_SPEED = 0.0
 _C.SIMULATOR.PEOPLE_ANG_SPEED = 0.0
 _C.SIMULATOR.TIME_STEP = 0.0
+_C.SIMULATOR.NUM_OBJECTS = 1
 # -----------------------------------------------------------------------------
 # PYROBOT
 # -----------------------------------------------------------------------------

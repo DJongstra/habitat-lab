@@ -76,7 +76,7 @@ none_action = {
 
 cv2.namedWindow("social-navigation")
 
-config = get_config(config_paths='habitat_baselines/config/pointnav/ppo_pointnav_example_social.yaml')
+config = get_config(config_paths='habitat_baselines/config/pointnav/ddppo_pointnav_social.yaml')
 env = habitat_baselines.common.environments.NavRLEnv(config=config)
 
 max_steps = 1000
@@ -110,6 +110,8 @@ for i in range(len(env.episodes)):
             action = none_action
         elif k == ord("q"):
             exit(0)
+        elif k == ord("t"):
+            break
         else:
             action = none_action
 

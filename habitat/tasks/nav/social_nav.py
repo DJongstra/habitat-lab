@@ -8,6 +8,12 @@ from habitat.core.embodied_task import EmbodiedTask, Measure
 from habitat.core.registry import registry
 from habitat.tasks.nav.nav import NavigationTask, TopDownMap
 from habitat.utils.visualizations import maps
+from habitat.tasks.utils import cartesian_to_polar
+from habitat.utils.geometry_utils import (
+    quaternion_from_coeff,
+    quaternion_rotate_vector,
+)
+from habitat_sim.utils.common import quat_from_magnum, angle_between_quats
 
 @registry.register_task(name="SocialNav-v0")
 class SocialNavigationTask(NavigationTask):
@@ -53,7 +59,7 @@ class SocialNavigationTask(NavigationTask):
 
         return observations
 
-# # '_config', '_sim', '_dataset', 'measurements', 'sensor_suite', 
+# # '_config', '_sim', '_dataset', 'measurements', 'sensor_suite',
 # # 'actions', '_action_keys', 'is_stop_called'
 
 
@@ -98,6 +104,12 @@ class SocialTopDownMap(TopDownMap):
             )
             for p in self._sim.people
         ]
+
+        # for obj in self._sim.objects:
+        #     pos = self._sim.get_translation(obj)
+        #     self._draw_point(
+        #         pos, maps.MAP_SOURCE_POINT_INDICATOR
+        #     )
 
         self._metric = {
             "map": house_map,
@@ -146,16 +158,89 @@ class HumanCollision(Measure):
             task.is_stop_called = True
 
 
+@registry.register_measure
+class ObjectDistance(Measure):
+
+    def __init__(
+        self, sim: "HabitatSim", config: Config, *args: Any, **kwargs: Any
+    ):
+        self._sim = sim
+        self._config = config
+        self.uuid = "object_distance"
+
+    def _get_uuid(self, *args: Any, **kwargs: Any) -> str:
+        return "object_distance"
+
+    def reset_metric(self, episode, *args: Any, **kwargs: Any):
+        self._metric = False
+
+    def update_metric(
+        self,
+        episode,
+        task: EmbodiedTask,
+        *args: Any,
+        **kwargs: Any
+    ):
+        agent_pos = self._sim.get_agent_state().position
+
+        distance = None
+        for obj in self._sim.objects:
+            pos = self._sim.get_translation(obj)
+            current_distance = np.sqrt(
+                (pos[0] - agent_pos[0]) ** 2
+                + (pos[2] - agent_pos[2]) ** 2
+            )
+            if distance == None or current_distance < distance:
+                distance = current_distance
+        self._metric = distance
 
 
 
+@registry.register_measure
+class PeoplePositioning(Measure):
+
+    def __init__(
+        self, sim: "HabitatSim", config: Config, *args: Any, **kwargs: Any
+    ):
+        self._sim = sim
+        self._config = config
+        self.uuid = "people_positioning"
+
+    def _get_uuid(self, *args: Any, **kwargs: Any) -> str:
+        return "people_positioning"
+
+    def reset_metric(self, episode, task, *args: Any, **kwargs: Any):
+        self.update_metric(  # type:ignore
+            episode=episode, task=task, *args, **kwargs
+        )
+
+    def update_metric(
+        self,
+        episode,
+        task: EmbodiedTask,
+        *args: Any,
+        **kwargs: Any
+    ):
+        agent_pos = self._sim.get_agent_state().position
+        distance = np.NaN
+        people_rotation = None
+        for p in self._sim.people:
+            current_distance = np.sqrt(
+                (p.current_position[0]-agent_pos[0])**2
+                +(p.current_position[2]-agent_pos[2])**2
+            )
+            if distance == np.NaN or current_distance < distance:
+                distance = current_distance
+                people_rotation = quat_from_magnum(self._sim.get_rotation(p.object_id)) # p.object_id
+
+        agent_state = self._sim.get_agent_state()
+        orientation = np.NaN
+
+        if people_rotation is not None:
+            orientation = angle_between_quats(agent_state.rotation, people_rotation)
 
 
-
-
-
-
-
-
-
-            
+        self._metric = {
+            "distance": distance,
+            "orientation": orientation
+        }

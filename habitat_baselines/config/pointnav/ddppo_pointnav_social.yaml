@@ -1,4 +1,4 @@
-BASE_TASK_CONFIG_PATH: "configs/tasks/socialnav-nomap.yaml"
+BASE_TASK_CONFIG_PATH: "configs/tasks/socialnav.yaml"
 
 ENV_NAME: "NavRLEnv"
 
