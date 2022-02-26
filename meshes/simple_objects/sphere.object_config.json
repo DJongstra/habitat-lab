@@ -1,0 +1,7 @@
+{
+    "render_asset": "sphere.obj",
+    "collision_asset": "sphere.obj",
+    "use_bounding_box_for_collision" : true,
+    "join_collision_meshes" : true,
+    "is_collidable": true
+}

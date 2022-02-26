@@ -48,10 +48,10 @@ class iGibsonSocialNav(HabitatSim):
             # For each object, an <object>.object_config.json file is required.
             # See:https://aihabitat.org/docs/habitat-sim/attributesJSON.html#objectattributes
             # for more information.
-            "./person_meshes"
+            "./meshes/person_meshes"
         )
 
-        self.obj_template_ids = obj_templates_mgr.load_configs("./data/objects/simple_objects")
+        self.obj_template_ids = obj_templates_mgr.load_configs("./meshes/simple_objects")
         self.person_ids = []
         self.people_mask = config.get('PEOPLE_MASK', False)
         self.num_people = config.get('NUM_PEOPLE', 1)

@@ -1,0 +1,8 @@
+{
+    "render_asset": "long-cube.obj",
+    "collision_asset": "long-cube.obj",
+    "use_bounding_box_for_collision" : true,
+    "join_collision_meshes" : true,
+    "is_collidable": true,
+    "scale": [1,1.5,1]
+}
