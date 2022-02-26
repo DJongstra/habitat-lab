@@ -183,14 +183,14 @@ class ObjectDistance(Measure):
     ):
         agent_pos = self._sim.get_agent_state().position
 
-        distance = None
+        distance = np.NaN
         for obj in self._sim.objects:
             pos = self._sim.get_translation(obj)
             current_distance = np.sqrt(
                 (pos[0] - agent_pos[0]) ** 2
                 + (pos[2] - agent_pos[2]) ** 2
             )
-            if distance == None or current_distance < distance:
+            if distance == np.NaN or current_distance < distance:
                 distance = current_distance
         self._metric = distance
 
