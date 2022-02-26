@@ -105,12 +105,6 @@ class SocialTopDownMap(TopDownMap):
             for p in self._sim.people
         ]
 
-        # for obj in self._sim.objects:
-        #     pos = self._sim.get_translation(obj)
-        #     self._draw_point(
-        #         pos, maps.MAP_SOURCE_POINT_INDICATOR
-        #     )
-
         self._metric = {
             "map": house_map,
             "fog_of_war_mask": self._fog_of_war_mask,
@@ -183,15 +177,19 @@ class ObjectDistance(Measure):
     ):
         agent_pos = self._sim.get_agent_state().position
 
-        distance = np.NaN
+        distance = None
         for obj in self._sim.objects:
             pos = self._sim.get_translation(obj)
             current_distance = np.sqrt(
                 (pos[0] - agent_pos[0]) ** 2
                 + (pos[2] - agent_pos[2]) ** 2
             )
-            if distance == np.NaN or current_distance < distance:
+            if distance == None or current_distance < distance:
                 distance = current_distance
+
+        if distance is None:
+            distance = np.NaN
+
         self._metric = distance
 
 
@@ -222,14 +220,14 @@ class PeoplePositioning(Measure):
         **kwargs: Any
     ):
         agent_pos = self._sim.get_agent_state().position
-        distance = np.NaN
+        distance = None
         people_rotation = None
         for p in self._sim.people:
             current_distance = np.sqrt(
                 (p.current_position[0]-agent_pos[0])**2
                 +(p.current_position[2]-agent_pos[2])**2
             )
-            if distance == np.NaN or current_distance < distance:
+            if distance == None or current_distance < distance:
                 distance = current_distance
                 people_rotation = quat_from_magnum(self._sim.get_rotation(p.object_id)) # p.object_id
 
@@ -239,6 +237,8 @@ class PeoplePositioning(Measure):
         if people_rotation is not None:
             orientation = angle_between_quats(agent_state.rotation, people_rotation)
 
+        if distance is None:
+            distance = np.NaN
 
         self._metric = {
             "distance": distance,
