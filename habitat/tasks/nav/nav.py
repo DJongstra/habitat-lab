@@ -705,11 +705,12 @@ class Collisions(Measure):
 
     def update_metric(self, episode, action, *args: Any, **kwargs: Any):
         if self._metric is None:
-            self._metric = {"count": 0, "is_collision": False}
+            self._metric = {"count": 0, "is_collision": False, "collided": False}
         self._metric["is_collision"] = False
         if self._sim.previous_step_collided:
             self._metric["count"] += 1
             self._metric["is_collision"] = True
+            self._metric["collided"] = True # if collided at least once during episode
 
 
 @registry.register_measure

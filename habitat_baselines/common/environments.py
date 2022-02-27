@@ -92,7 +92,7 @@ class NavRLEnv(habitat.RLEnv):
                         +(p.current_position[2]-agent_pos[2])**2
                     )
                     if distance < self._rl_config.get('PENALTY_RADIUS', 1.5):
-                        reward -= self._rl_config.PROXIMITY_PENALTY
+                        reward -= proximity_penalty
                         break
             # elif sim.interactive_nav:
             #     for p in sim.object_positions:
