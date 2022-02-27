@@ -44,6 +44,7 @@ EVAL_CKPT_PATH_DIR: "checkpoints"
 
 RL:
   SUCCESS_REWARD: 2.5
+  PROXIMITY_PENALTY: 0.0
 
   POLICY:
     name: "PointNavResNetPolicy"
