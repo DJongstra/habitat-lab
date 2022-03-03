@@ -263,20 +263,6 @@ def poll_checkpoint_folder(
     if ind < len(models_paths):
         return models_paths[ind]
     return None
-    # models_paths = list(
-    #     filter(
-    #         lambda x: not os.path.isfile(x+'.done'),
-    #         glob.glob(os.path.join(checkpoint_folder, '*.pth'))
-    #     )
-    # )
-    # models_paths = sorted(models_paths, key=lambda x: int(x.split('.')[-2]))
-    # if len(models_paths) > 0:
-    #     # with open(models_paths[0]+'.done','w') as f:
-    #     #     pass
-    #     return models_paths[0]
-    # else:
-    #     exit()
-    # return None
 
 def get_checkpoint_paths(checkpoint_folder: str):
     assert os.path.isdir(checkpoint_folder), (
@@ -316,13 +302,20 @@ def generate_video(
     if len(images) < 1:
         return
 
+    #list of metrics to leave out of the filename
+    leave_out_name = ["social_top_down_map.agent_angle", "people_positioning.orientation", "collisions.collided"]
+
     metric_strs = []
     for k, v in metrics.items():
+        if k in leave_out_name:
+            continue
         metric_strs.append(f"{k}={v:.2f}")
 
-    video_name = f"episode={episode_id}-ckpt={checkpoint_idx}-" + "-".join(
-        metric_strs
-    )
+    # forcefully limit the amount of characters spend on metrics in file name
+    metric_strs = "-".join(metric_strs)
+    metric_strs = metric_strs[:200]
+
+    video_name = f"episode={episode_id}-ckpt={checkpoint_idx}-" + metric_strs
     if "disk" in video_option:
         assert video_dir is not None
         images_to_video(images, video_dir, video_name)
