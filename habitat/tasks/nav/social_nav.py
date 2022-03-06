@@ -208,8 +208,9 @@ class ObjectDistance(Measure):
             }
         else:
             self._metric["distance"] = distance
-            if task.is_stop_called:
+            if hasattr(task, "is_stop_called") and task.is_stop_called:
                 self._metric["min_distance"] = self.min_distance
+                print(self._metric)
 
 
 
@@ -278,13 +279,16 @@ class PeoplePositioning(Measure):
         else:
             self._metric["distance"] = distance
             self._metric["orientation"] = orientation
-            if task.is_stop_called:
+            if hasattr(task, "is_stop_called") and task.is_stop_called:
                 self._metric["min_distance"] = self.min_distance
 
 
 
 @registry.register_measure
 class PathIrregularity(Measure):
+    """
+    Keeps the absolute angular and linear accelaration and the amount of direction changes
+    """
 
     def __init__(
         self, sim: "HabitatSim", config: Config, *args: Any, **kwargs: Any
