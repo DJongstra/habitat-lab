@@ -1315,8 +1315,8 @@ class VelocityAction(SimulatorTaskAction):
         agent_observations["lin_accel"] = (
             lin_vel - self.prev_lin_vel
         ) / self.time_step
-        agent_observations["lin"] = lin_vel
-        agent_observations["ang"] = ang_vel
+        agent_observations["lin_speed"] = lin_vel
+        agent_observations["ang_speed"] = ang_vel
         if kwargs.get('num_steps', -1) != -1:
             agent_observations["num_steps"] = kwargs["num_steps"]
 
