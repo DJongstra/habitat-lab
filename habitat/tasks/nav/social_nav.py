@@ -154,6 +154,13 @@ class HumanCollision(Measure):
 
 @registry.register_measure
 class ObjectDistance(Measure):
+    """
+    Measure for the distance of the agent to the closest object
+    - self._metric["distance"] are the distances of all steps during an episode
+     to the closest object
+    - self._metric["min_distance"] is the minimal distance kept to objects
+     during an episode
+    """
 
     def __init__(
         self, sim: "HabitatSim", config: Config, *args: Any, **kwargs: Any
@@ -166,7 +173,8 @@ class ObjectDistance(Measure):
         return "object_distance"
 
     def reset_metric(self, episode, *args: Any, **kwargs: Any):
-        self._metric = False
+        self._metric = None
+        self.min_distance = None
 
     def update_metric(
         self,
@@ -190,12 +198,31 @@ class ObjectDistance(Measure):
         if distance is None:
             distance = np.NaN
 
-        self._metric = distance
+        if self.min_distance is None or distance < self.min_distance:
+            self.min_distance = distance
+
+        if self._metric is None:
+            self._metric = {
+                "distance": distance,
+                "min_distance": None
+            }
+        else:
+            self._metric["distance"] = distance
+            if task.is_stop_called:
+                self._metric["min_distance"] = self.min_distance
 
 
 
 @registry.register_measure
 class PeoplePositioning(Measure):
+    """
+        Measure for the distance of the agent to the closest person
+        - self._metric["distance"] are the distances of all steps during an episode
+         to the closest person
+        - self._metric["min_distance"] is the minimal distance kept to people
+         during an episode
+        - self._metric["orientation"] is the angle between the agent and the closest person
+        """
 
     def __init__(
         self, sim: "HabitatSim", config: Config, *args: Any, **kwargs: Any
@@ -208,9 +235,8 @@ class PeoplePositioning(Measure):
         return "people_positioning"
 
     def reset_metric(self, episode, task, *args: Any, **kwargs: Any):
-        self.update_metric(  # type:ignore
-            episode=episode, task=task, *args, **kwargs
-        )
+        self._metric = None
+        self.min_distance = None
 
     def update_metric(
         self,
@@ -229,7 +255,7 @@ class PeoplePositioning(Measure):
             )
             if distance == None or current_distance < distance:
                 distance = current_distance
-                people_rotation = quat_from_magnum(self._sim.get_rotation(p.object_id)) # p.object_id
+                people_rotation = quat_from_magnum(self._sim.get_rotation(p.object_id))
 
         agent_state = self._sim.get_agent_state()
         orientation = np.NaN
@@ -240,7 +266,62 @@ class PeoplePositioning(Measure):
         if distance is None:
             distance = np.NaN
 
-        self._metric = {
-            "distance": distance,
-            "orientation": orientation
-        }
+        if self.min_distance is None or distance < self.min_distance:
+            self.min_distance = distance
+
+        if self._metric is None:
+            self._metric = {
+                "distance": distance,
+                "orientation": orientation,
+                "min_distance": None
+            }
+        else:
+            self._metric["distance"] = distance
+            self._metric["orientation"] = orientation
+            if task.is_stop_called:
+                self._metric["min_distance"] = self.min_distance
+
+
+
+@registry.register_measure
+class PathIrregularity(Measure):
+
+    def __init__(
+        self, sim: "HabitatSim", config: Config, *args: Any, **kwargs: Any
+    ):
+        self._sim = sim
+        self._config = config
+        self.uuid = "path_irregularity"
+
+    def _get_uuid(self, *args: Any, **kwargs: Any) -> str:
+        return "path_irregularity"
+
+    def reset_metric(self, episode, *args: Any, **kwargs: Any):
+        self._metric = None
+        self.ang_accel_pos = None
+        self.lin_accel_pos = None
+
+
+    def update_metric(
+        self,
+        episode,
+        task: EmbodiedTask,
+        observations,
+        *args: Any,
+        **kwargs: Any
+    ):
+        if not ("ang_accel" in observations or  "lin_accel" in observations):
+            self._metric = np.NaN
+            return
+        ang_accel = observations["ang_accel"]
+        lin_accel = observations["lin_accel"]
+        #observations["temp"]
+
+        # print( " ----------- ")
+        # print(ang_accel)
+        # print(lin_accel)
+        # print(observations["ang"])
+        # print(observations["lin"])
+
+
+

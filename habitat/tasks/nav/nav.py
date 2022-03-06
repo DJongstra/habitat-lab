@@ -1159,6 +1159,7 @@ class VelocityAction(SimulatorTaskAction):
 
         # For acceleration penalty
         self.prev_ang_vel = 0.0
+        self.prev_lin_vel = 0.0
 
     @property
     def action_space(self):
@@ -1311,10 +1312,16 @@ class VelocityAction(SimulatorTaskAction):
         agent_observations["ang_accel"] = (
             ang_vel - self.prev_ang_vel
         ) / self.time_step
+        agent_observations["lin_accel"] = (
+            lin_vel - self.prev_lin_vel
+        ) / self.time_step
+        agent_observations["lin"] = lin_vel
+        agent_observations["ang"] = ang_vel
         if kwargs.get('num_steps', -1) != -1:
             agent_observations["num_steps"] = kwargs["num_steps"]
 
         self.prev_ang_vel = ang_vel
+        self.prev_lin_vel = lin_vel
 
         return agent_observations
 

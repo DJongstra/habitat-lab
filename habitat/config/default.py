@@ -211,6 +211,11 @@ _C.TASK.PEOPLE_POSITIONING.TYPE = "PeoplePositioning"
 _C.TASK.OBJECT_DISTANCE = CN()
 _C.TASK.OBJECT_DISTANCE.TYPE = "ObjectDistance"
 # -----------------------------------------------------------------------------
+# PATH_IRREGULARITY MEASUREMENT
+# -----------------------------------------------------------------------------
+_C.TASK.PATH_IRREGULARITY = CN()
+_C.TASK.PATH_IRREGULARITY.TYPE = "PathIrregularity"
+# -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 # # EQA TASK
 # -----------------------------------------------------------------------------

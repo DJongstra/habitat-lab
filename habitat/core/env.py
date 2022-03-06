@@ -266,7 +266,7 @@ class Env:
         )
 
         self._task.measurements.update_measures(
-            episode=self.current_episode, action=action, task=self.task
+            episode=self.current_episode, action=action, task=self.task, observations=observations
         )
 
         self._update_step_stats()
