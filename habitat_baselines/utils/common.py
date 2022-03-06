@@ -303,12 +303,26 @@ def generate_video(
         return
 
     #list of metrics to leave out of the filename
-    leave_out_name = ["social_top_down_map.agent_angle", "people_positioning.orientation", "collisions.collided"]
+    leave_out_name = ["social_top_down_map.agent_angle", "people_positioning.orientation",
+                      "collisions.collided", "people_positioning.distance", "object_distance.distance"]
+
+    # renaming metrics to a shorter version
+    rename = {
+        "path_irregularity.ang_accel": "ang_accel",
+        "path_irregularity.lin_accel": "lin_accel",
+        "path_irregularity.direction_change": "direction_change",
+        "people_positioning.min_distance": "people_min_dist",
+        "object_distance.min_distance": "object_min_dist",
+        "collisions.count": "collisions"
+
+    }
 
     metric_strs = []
     for k, v in metrics.items():
         if k in leave_out_name:
             continue
+        if k in rename:
+            k = rename[k]
         metric_strs.append(f"{k}={v:.2f}")
 
     # forcefully limit the amount of characters spend on metrics in file name
