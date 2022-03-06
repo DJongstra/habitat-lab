@@ -306,8 +306,6 @@ class PathIrregularity(Measure):
             "ang_accel": 0.0,
             "lin_accel": 0.0
         }
-        # bool: last angular speed positive, for direction changes
-        self.ang_speed_pos = None
 
     def update_metric(
         self,
@@ -322,14 +320,8 @@ class PathIrregularity(Measure):
             return
         ang_accel = observations["ang_accel"]
         lin_accel = observations["lin_accel"]
-        ang_speed = observations["ang_speed"]
 
-        if self.ang_speed_pos is None and ang_speed != 0.0:
-            self.ang_speed_pos = (ang_speed > 0)
-        elif (self.ang_speed_pos and ang_speed < 0) or (not self.ang_speed_pos and ang_speed > 0):
-            self._metric["direction_change"] += 1
-            self.ang_speed_pos = (not self.ang_speed_pos)
-
+        self._metric["direction_change"] += observations["change_direction"]
         self._metric["ang_accel"] = abs(ang_accel)
         self._metric["lin_accel"] = abs(lin_accel)
 

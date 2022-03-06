@@ -112,6 +112,18 @@ class NavRLEnv(habitat.RLEnv):
                 self._rl_config.MAX_ANG_ACCEL_PENALTY,
             )
 
+        if 'lin_accel' in observations:
+            reward -= min(
+                abs(observations['lin_accel'])
+                * self._rl_config.LIN_ACCEL_PENALTY_COEFF,
+                self._rl_config.MAX_LIN_ACCEL_PENALTY,
+            )
+
+        if 'change_direction' in observations and observations["change_direction"]:
+            reward -= self._rl_config.DIRECTION_CHANGE_PENALTY
+
+
+
         return reward
 
     def _episode_success(self):

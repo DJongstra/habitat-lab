@@ -1161,6 +1161,9 @@ class VelocityAction(SimulatorTaskAction):
         self.prev_ang_vel = 0.0
         self.prev_lin_vel = 0.0
 
+        # bool: last angular speed positive, for direction changes
+        self.ang_speed_pos = None
+
     @property
     def action_space(self):
         return ActionSpace(
@@ -1181,6 +1184,9 @@ class VelocityAction(SimulatorTaskAction):
     def reset(self, task: EmbodiedTask, *args: Any, **kwargs: Any):
         task.is_stop_called = False  # type: ignore
         self.prev_ang_vel = 0.0
+        self.prev_lin_vel = 0.0
+        self.ang_speed_pos = None
+
         if not self._sim.get_existing_object_ids():
             if self._sim.social_nav:
                 obj_templates_mgr = self._sim.get_object_template_manager()
@@ -1319,6 +1325,13 @@ class VelocityAction(SimulatorTaskAction):
         agent_observations["ang_speed"] = ang_vel
         if kwargs.get('num_steps', -1) != -1:
             agent_observations["num_steps"] = kwargs["num_steps"]
+
+        agent_observations["change_direction"] = False
+        if self.ang_speed_pos is None and ang_vel != 0.0:
+            self.ang_speed_pos = (ang_vel > 0)
+        elif (self.ang_speed_pos and ang_vel < 0) or (not self.ang_speed_pos and ang_vel > 0):
+            agent_observations["change_direction"] = True
+            self.ang_speed_pos = (not self.ang_speed_pos)
 
         self.prev_ang_vel = ang_vel
         self.prev_lin_vel = lin_vel

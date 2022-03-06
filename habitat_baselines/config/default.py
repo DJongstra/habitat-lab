@@ -75,6 +75,9 @@ _C.RL.COLLISION_PENALTY = 0.0
 _C.RL.BACKWARDS_PENALTY = 0.0
 _C.RL.ANG_ACCEL_PENALTY_COEFF = 0.0
 _C.RL.MAX_ANG_ACCEL_PENALTY = 0.0
+_C.RL.LIN_ACCEL_PENALTY_COEFF = 0.0
+_C.RL.MAX_LIN_ACCEL_PENALTY = 0.0
+_C.RL.DIRECTION_CHANGE_PENALTY = 0.0
 # -----------------------------------------------------------------------------
 # DATA AUGMENTATION CONFIG
 # -----------------------------------------------------------------------------
