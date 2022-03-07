@@ -450,9 +450,6 @@ class PPOTrainer(BaseRLTrainer):
             # Things that are scalar-like will have an np.size of 1.
             # Strings also have an np.size of 1, so explicitly ban those
             elif np.size(v) == 1 and not isinstance(v, str):
-                if v is None:
-                    print("None value found... that is not supposed to happen!")
-                    print(k)
                 result[k] = float(v)
 
         return result

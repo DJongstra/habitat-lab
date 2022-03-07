@@ -304,7 +304,7 @@ def generate_video(
 
     #list of metrics to leave out of the filename
     leave_out_name = ["social_top_down_map.agent_angle", "people_positioning.orientation",
-                      "collisions.collided", "people_positioning.distance", "object_distance.distance"]
+                      "collisions.collided",]
 
     # renaming metrics to a shorter version
     rename = {
@@ -312,7 +312,6 @@ def generate_video(
         "path_irregularity.lin_accel": "lin_accel",
         "path_irregularity.direction_change": "direction_change",
         "people_positioning.min_distance": "people_min_dist",
-        "object_distance.min_distance": "object_min_dist",
         "collisions.count": "collisions"
 
     }

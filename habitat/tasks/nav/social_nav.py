@@ -180,7 +180,6 @@ class ObjectDistance(Measure):
         self,
         episode,
         task: EmbodiedTask,
-        next_done,
         *args: Any,
         **kwargs: Any
     ):
@@ -202,15 +201,15 @@ class ObjectDistance(Measure):
         if self.min_distance is None or distance < self.min_distance:
             self.min_distance = distance
 
-        if self._metric is None:
-            self._metric = {
-                "distance": distance,
-                "min_distance": None
-            }
-        else:
-            self._metric["distance"] = distance
-            if (hasattr(task, "is_stop_called") and task.is_stop_called) or next_done:
-                self._metric["min_distance"] = self.min_distance
+        # if self._metric is None:
+        #     self._metric = {
+        #         "distance": distance,
+        #         "min_distance": self.min_distance
+        #     }
+        # else:
+        #     self._metric["distance"] = distance
+        #     self._metric["min_distance"] = self.min_distance
+        self._metric = self.min_distance
 
 
 
@@ -231,6 +230,7 @@ class PeoplePositioning(Measure):
         self._sim = sim
         self._config = config
         self.uuid = "people_positioning"
+        self._metric = None
 
     def _get_uuid(self, *args: Any, **kwargs: Any) -> str:
         return "people_positioning"
@@ -243,7 +243,6 @@ class PeoplePositioning(Measure):
         self,
         episode,
         task: EmbodiedTask,
-        next_done,
         *args: Any,
         **kwargs: Any
     ):
@@ -273,15 +272,14 @@ class PeoplePositioning(Measure):
 
         if self._metric is None:
             self._metric = {
-                "distance": distance,
+                #"distance": distance,
                 "orientation": orientation,
-                "min_distance": None
+                "min_distance": self.min_distance
             }
         else:
-            self._metric["distance"] = distance
+            #self._metric["distance"] = distance
             self._metric["orientation"] = orientation
-            if (hasattr(task, "is_stop_called") and task.is_stop_called) or next_done:
-                self._metric["min_distance"] = self.min_distance
+            self._metric["min_distance"] = self.min_distance
 
 
 
