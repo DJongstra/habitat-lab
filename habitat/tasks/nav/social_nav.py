@@ -180,6 +180,7 @@ class ObjectDistance(Measure):
         self,
         episode,
         task: EmbodiedTask,
+        next_done,
         *args: Any,
         **kwargs: Any
     ):
@@ -208,9 +209,8 @@ class ObjectDistance(Measure):
             }
         else:
             self._metric["distance"] = distance
-            if hasattr(task, "is_stop_called") and task.is_stop_called:
+            if (hasattr(task, "is_stop_called") and task.is_stop_called) or next_done:
                 self._metric["min_distance"] = self.min_distance
-                print(self._metric)
 
 
 
@@ -243,6 +243,7 @@ class PeoplePositioning(Measure):
         self,
         episode,
         task: EmbodiedTask,
+        next_done,
         *args: Any,
         **kwargs: Any
     ):
@@ -279,7 +280,7 @@ class PeoplePositioning(Measure):
         else:
             self._metric["distance"] = distance
             self._metric["orientation"] = orientation
-            if hasattr(task, "is_stop_called") and task.is_stop_called:
+            if (hasattr(task, "is_stop_called") and task.is_stop_called) or next_done:
                 self._metric["min_distance"] = self.min_distance
 
 
@@ -316,7 +317,6 @@ class PathIrregularity(Measure):
         **kwargs: Any
     ):
         if not ("ang_accel" in observations or  "lin_accel" in observations):
-            # self._metric = np.NaN
             return
         ang_accel = observations["ang_accel"]
         lin_accel = observations["lin_accel"]

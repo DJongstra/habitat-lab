@@ -184,15 +184,16 @@ class Env:
     def get_metrics(self) -> Metrics:
         return self._task.measurements.get_metrics()
 
-    def _past_limit(self) -> bool:
+    def _past_limit(self, in_steps=0) -> bool:
+        """ check whether max steps in an epsiode are reached within in_steps steps"""
         if (
             self._max_episode_steps != 0
-            and self._max_episode_steps <= self._elapsed_steps
+            and self._max_episode_steps <= (self._elapsed_steps + in_steps)
         ):
             return True
         elif (
             self._max_episode_seconds != 0
-            and self._max_episode_seconds <= self._elapsed_seconds
+            and self._max_episode_seconds <= (self._elapsed_seconds + in_steps)
         ):
             return True
         return False
@@ -265,8 +266,12 @@ class Env:
             action=action, episode=self.current_episode
         )
 
+        next_done = False
+        if self._past_limit(in_steps=1):
+            next_done=True
+
         self._task.measurements.update_measures(
-            episode=self.current_episode, action=action, task=self.task, observations=observations
+            episode=self.current_episode, action=action, task=self.task, observations=observations, next_done=next_done
         )
 
         self._update_step_stats()
