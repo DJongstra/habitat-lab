@@ -18,7 +18,7 @@ from habitat_sim.utils.common import quat_from_magnum, angle_between_quats
 @registry.register_task(name="SocialNav-v0")
 class SocialNavigationTask(NavigationTask):
     def reset(self, episode: Episode):
-        self._sim.reset_people(episode)
+        self._sim.reset_objects_people(episode)
         episode.people_paths = [
             p.waypoints
             for p in self._sim.people

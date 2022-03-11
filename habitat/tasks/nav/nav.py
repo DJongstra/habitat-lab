@@ -1193,7 +1193,7 @@ class VelocityAction(SimulatorTaskAction):
                 self._sim.people_template_ids = obj_templates_mgr.load_configs(
                     "./meshes/person_meshes"
                 )
-                self._sim.reset_people()
+                self._sim.reset_objects_people()
 
     def step(
         self,
