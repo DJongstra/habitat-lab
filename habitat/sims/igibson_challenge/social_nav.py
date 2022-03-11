@@ -57,6 +57,7 @@ class iGibsonSocialNav(HabitatSim):
         self.num_people = config.get('NUM_PEOPLE', 1)
         self.social_nav = True
         self.interactive_nav = False
+        self.force_around_path = config.get('FORCE_AROUND_PATH', True)
 
         # People params
         self.people_mask = config.get('PEOPLE_MASK', False)
@@ -64,12 +65,16 @@ class iGibsonSocialNav(HabitatSim):
         self.ang_speed = np.deg2rad(config.PEOPLE_ANG_SPEED)
         self.time_step = config.TIME_STEP
 
+        if self.force_around_path:
+            self.lin_speed = 0.0
+            self.ang_speed = 0.0
+
         # Objects
         self.objects = []
         self.num_objects = config.get('NUM_OBJECTS', 10)
 
 
-    def reset_people(self):
+    def reset_people(self, episode):
         agent_position = self.get_agent_state().position
         obj_templates_mgr = self.get_object_template_manager()
 
@@ -88,20 +93,179 @@ class iGibsonSocialNav(HabitatSim):
                             self.people_template_ids)]))
                 people_count += 1
 
-        #spawn objects
-        self.objects = []
-        obj_count = 0
-        first_object = np.random.randint(0, len(self.obj_template_ids))
-        while obj_count < self.num_objects:
-            obj = self.add_object(self.obj_template_ids[(obj_count+first_object)%len(self.obj_template_ids)])
-            start = np.array(self.sample_navigable_point())
-            self.set_translation([start[0], start[1], start[2]], obj)
-            self.set_object_motion_type(
-                habitat_sim.physics.MotionType.STATIC,
-                obj
+        if self.force_around_path:
+            path = habitat_sim.ShortestPath()
+            path.requested_start = episode.start_position
+            path.requested_end = np.array(
+                episode.goals[0].position, dtype=np.float32
             )
-            self.objects.append(obj)
-            obj_count += 1
+            self.pathfinder.find_path(path)
+
+            spawn_areas = []
+            point_idx = 0
+            for idx, p1 in enumerate(path.points[:-1]):
+                p1 = path.points[point_idx]
+                p2 = path.points[point_idx+1]
+                curr_dist = 0.5
+                euclid_dist = np.sqrt( (p1[0]-p2[0])**2 + (p1[2]-p2[2])**2 )
+                while curr_dist < euclid_dist:
+                    new_x = p1[0]+(p2[0]-p1[0]*curr_dist/euclid_dist)
+                    new_y = p1[2]+(p2[2]-p1[2]*curr_dist/euclid_dist)
+                    spawn_areas.append([new_x, p1[1], new_y])
+                    curr_dist += 0.5
+                curr_dist = 0
+                spawn_areas.append(path.points[point_idx+1])
+                point_idx += 1
+
+            spawn_points = []
+            for sa in spawn_areas:
+                found = False
+                for _ in range(20):
+                    rand_r = 0.5 * np.sqrt(np.random.rand()) # TODO make this adjustable
+                    rand_theta = np.random.rand() * 2 * np.pi
+                    x = sa[0] + rand_r * np.cos(rand_theta)
+                    y = sa[2] + rand_r * np.sin(rand_theta)
+                    if self.pathfinder.is_navigable([x, sa[1], y]):
+                        found = True
+                        break
+                if not found:
+                    spawn_points.append(sa)
+                else:
+                    spawn_points.append([x, sa[1], y])
+
+            self.objects = []
+            random.shuffle(spawn_points)
+            for idx, sp in enumerate(spawn_points):
+                print(idx, " -  ", sp)
+
+            for idx, sp in enumerate(spawn_points):
+                if idx >= self.num_objects:
+                    break
+
+                obj = self.add_object(self.obj_template_ids[(idx)%len(self.obj_template_ids)])
+                pos = np.array([sp[0], sp[1]+0.05, sp[2]], dtype=np.float32)
+                self.set_translation(pos, obj)
+                self.set_object_motion_type(
+                    habitat_sim.physics.MotionType.STATIC,
+                    obj
+                )
+                self.objects.append(obj)
+
+            self.people = []
+            for person_id in self.person_ids:
+                valid_walk = False
+                while not valid_walk:
+                    if idx >= len(spawn_points):
+                        break
+                    start = np.array(spawn_points[idx])
+                    found_path = self.pathfinder.is_navigable(start)
+                    valid_walk = found_path
+                    idx += 1
+
+                waypoints = [start]
+
+                heading = np.random.rand() * 2 * np.pi - np.pi
+                rotation = np.quaternion(np.cos(heading), 0, np.sin(heading),
+                                         0)
+                rotation = np.normalized(rotation)
+                rotation = mn.Quaternion(
+                    rotation.imag, rotation.real
+                )
+
+                self.set_translation([start[0], start[1] + 0.8, start[2]],
+                                     person_id)
+                self.set_rotation(rotation, person_id)
+                self.set_object_motion_type(
+                    habitat_sim.physics.MotionType.KINEMATIC,
+                    person_id
+                )
+                spf = ShortestPathFollowerv2(
+                    sim=self,
+                    object_id=person_id,
+                    waypoints=waypoints,
+                    lin_speed=self.lin_speed,
+                    ang_speed=self.ang_speed,
+                    time_step=self.time_step,
+                )
+                self.people.append(spf)
+
+        else:
+            # spawn objects in random positions
+            self.objects = []
+            obj_count = 0
+            first_object = np.random.randint(0, len(self.obj_template_ids))
+            while obj_count < self.num_objects:
+                obj = self.add_object(self.obj_template_ids[(obj_count+first_object)%len(self.obj_template_ids)])
+                start = np.array(self.sample_navigable_point())
+                self.set_translation([start[0], start[1], start[2]], obj)
+                self.set_object_motion_type(
+                    habitat_sim.physics.MotionType.STATIC,
+                    obj
+                )
+                self.objects.append(obj)
+                obj_count += 1
+
+            # Spawn humans
+            min_path_dist = 3
+            max_level = 0.6
+            agent_x, agent_y, agent_z = self.get_agent_state(0).position
+            self.people = []
+            for person_id in self.person_ids:
+                valid_walk = False
+                while not valid_walk:
+                    start = np.array(self.sample_navigable_point())
+                    goal = np.array(self.sample_navigable_point())
+                    distance = self.geodesic_distance(start, goal)
+                    valid_distance = distance > min_path_dist
+                    valid_level = (
+                        abs(start[1] - agent_position[1]) < max_level
+                        and abs(goal[1] - agent_position[1]) < max_level
+                    )
+                    sp = habitat_sim.nav.ShortestPath()
+                    sp.requested_start = start
+                    sp.requested_end = goal
+                    found_path = self.pathfinder.find_path(sp)
+                    valid_start = np.sqrt(
+                        (start[0] - agent_x) ** 2
+                        + (start[2] - agent_z) ** 2
+                    ) > 0.5
+                    valid_walk = (
+                        valid_distance and valid_level
+                        and found_path and valid_start
+                    )
+                    if not valid_distance:
+                        min_path_dist *= 0.95
+
+                waypoints = []
+                if not (self.lin_speed == 0.0 and self.ang_speed == 0.0):
+                    waypoints = sp.points
+                else:
+                    waypoints = [sp.points[0]]
+
+                heading = np.random.rand() * 2 * np.pi - np.pi
+                rotation = np.quaternion(np.cos(heading), 0, np.sin(heading),
+                                         0)
+                rotation = np.normalized(rotation)
+                rotation = mn.Quaternion(
+                    rotation.imag, rotation.real
+                )
+
+                self.set_translation([start[0], start[1] + 0.8, start[2]],
+                                     person_id)
+                self.set_rotation(rotation, person_id)
+                self.set_object_motion_type(
+                    habitat_sim.physics.MotionType.KINEMATIC,
+                    person_id
+                )
+                spf = ShortestPathFollowerv2(
+                    sim=self,
+                    object_id=person_id,
+                    waypoints=waypoints,
+                    lin_speed=self.lin_speed,
+                    ang_speed=self.ang_speed,
+                    time_step=self.time_step,
+                )
+                self.people.append(spf)
 
         navmesh_settings = habitat_sim.NavMeshSettings()
         navmesh_settings.set_defaults()
@@ -109,65 +273,6 @@ class iGibsonSocialNav(HabitatSim):
             self.pathfinder, navmesh_settings, include_static_objects=True
         )
 
-        # Spawn humans
-        min_path_dist = 3
-        max_level = 0.6
-        agent_x, agent_y, agent_z = self.get_agent_state(0).position
-        self.people = []
-        for person_id in self.person_ids:
-            valid_walk = False
-            while not valid_walk:
-                start = np.array(self.sample_navigable_point())
-                goal = np.array(self.sample_navigable_point())
-                distance = self.geodesic_distance(start, goal)
-                valid_distance = distance > min_path_dist
-                valid_level = (
-                    abs(start[1]-agent_position[1]) < max_level
-                    and abs(goal[1]-agent_position[1]) < max_level
-                )
-                sp = habitat_sim.nav.ShortestPath()
-                sp.requested_start = start
-                sp.requested_end   = goal
-                found_path = self.pathfinder.find_path(sp)
-                valid_start = np.sqrt(
-                    (start[0]-agent_x)**2
-                    +(start[2]-agent_z)**2
-                ) > 0.5
-                valid_walk = (
-                    valid_distance and valid_level
-                    and found_path and valid_start
-                )
-                if not valid_distance:
-                    min_path_dist *= 0.95
-
-            waypoints = []
-            if not (self.lin_speed == 0.0 and self.ang_speed == 0.0):
-                waypoints = sp.points
-            else:
-                waypoints = [sp.points[0]]
-
-            heading = np.random.rand() * 2 * np.pi - np.pi
-            rotation = np.quaternion(np.cos(heading), 0, np.sin(heading), 0)
-            rotation = np.normalized(rotation)
-            rotation = mn.Quaternion(
-                rotation.imag, rotation.real
-            )
-
-            self.set_translation([start[0], start[1]+0.8, start[2]], person_id)
-            self.set_rotation(rotation, person_id)
-            self.set_object_motion_type(
-                habitat_sim.physics.MotionType.KINEMATIC,
-                person_id
-            )
-            spf = ShortestPathFollowerv2(
-                sim=self,
-                object_id=person_id,
-                waypoints=waypoints,
-                lin_speed=self.lin_speed,
-                ang_speed=self.ang_speed,
-                time_step=self.time_step,
-            )
-            self.people.append(spf)
 
     def get_observations_at(
         self,

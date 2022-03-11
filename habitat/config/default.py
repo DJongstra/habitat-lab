@@ -333,6 +333,7 @@ _C.SIMULATOR.PEOPLE_LIN_SPEED = 0.0
 _C.SIMULATOR.PEOPLE_ANG_SPEED = 0.0
 _C.SIMULATOR.TIME_STEP = 0.0
 _C.SIMULATOR.NUM_OBJECTS = 1
+_C.SIMULATOR.FORCE_AROUND_PATH = False # forces objects and static (!) people around shortest path
 # -----------------------------------------------------------------------------
 # PYROBOT
 # -----------------------------------------------------------------------------
