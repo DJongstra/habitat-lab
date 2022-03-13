@@ -18,7 +18,7 @@ SIMULATOR:
   PEOPLE_LIN_SPEED: 0.0 # both people speeds need to be set to zero to have a non-moving human
   PEOPLE_ANG_SPEED: 0.0
   TIME_STEP: 1.0
-  FORCE_AROUND_PATH: False
+  FORCE_AROUND_PATH: True
 TASK:
   TYPE: SocialNav-v0
   SUCCESS_DISTANCE: 0.2

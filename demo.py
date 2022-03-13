@@ -10,6 +10,7 @@ import habitat
 import habitat_baselines
 from habitat_baselines.config.default import get_config
 from habitat.utils.visualizations.maps import colorize_draw_agent_and_people_and_fit_to_height
+from habitat_baselines.common.environments import NavRLEnv
 
 ################################################################################
 # Utilities
@@ -116,6 +117,8 @@ for i in range(len(env.episodes)):
             action = none_action
 
         observations, _, _, info = env.step(action=action)
+        reward = env.get_reward(observations)
+        print("reward:  ", reward)
         count_steps += 1
 
         print(len(env.habitat_env.sim.people))

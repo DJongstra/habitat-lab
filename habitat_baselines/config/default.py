@@ -78,6 +78,8 @@ _C.RL.MAX_ANG_ACCEL_PENALTY = 0.0
 _C.RL.LIN_ACCEL_PENALTY_COEFF = 0.0
 _C.RL.MAX_LIN_ACCEL_PENALTY = 0.0
 _C.RL.DIRECTION_CHANGE_PENALTY = 0.0
+_C.RL.PROXIMITY_PENALTY = 0.0   # maximum penalty for close proximity
+_C.RL.PROXIMITY_COEFFICIENT = 0.15
 # -----------------------------------------------------------------------------
 # DATA AUGMENTATION CONFIG
 # -----------------------------------------------------------------------------

@@ -62,11 +62,11 @@ RUN conda install habitat-sim withbullet headless -c conda-forge -c aihabitat
 RUN conda install x264=='1!152.20180717' ffmpeg=4.0.2 -c conda-forge
 
 # Prevent using cache if new commit found
-ADD "https://api.github.com/repos/DJongstra/habitat-lab/commits/social_nav_v0?per_page=1" latest_commit
+ADD "https://api.github.com/repos/DJongstra/habitat-lab/commits/social_nav_v1?per_page=1" latest_commit
 
 # Install habitat lab: social_nav branch
 RUN cd / &&\
-    git clone -b social_nav_v0 https://github.com/djongstra/habitat-lab.git
+    git clone -b social_nav_v1 https://github.com/djongstra/habitat-lab.git
 
 
 RUN cd /habitat-lab &&\
