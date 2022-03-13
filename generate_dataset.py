@@ -23,7 +23,7 @@ parser.add_argument('--valid-episodes', default=50, type=int, help='Number of va
 parser.add_argument('--test-episodes', default=150, type=int, help='Number of testing episodes per scene.')
 
 # Output folder.
-parser.add_argument('--output', default='./data/datasets/pointnav/room3x3', help='Dataset root folder.')
+parser.add_argument('--output', default='./data/datasets/pointnav/room3x3/v0', help='Dataset root folder.')
 
 # Parse arguments.
 args = parser.parse_args()
@@ -45,14 +45,14 @@ for split, size in splits:
     print(f"Creating split: {split}")
 
     # Setup split folder.
-    (path / split / 'content').mkdir(parents=True, exist_ok=False)
+    (path / split).mkdir(parents=True, exist_ok=False)
 
     # Create an empty split task data set.
     dataset = habitat.Dataset()
     dataset.episodes = []
 
-    with gzip.open(path / split / f'{split}.json.gz', 'wb') as f:
-        f.write(dataset.to_json().encode())
+    # with gzip.open(path / split / f'{split}.json.gz', 'wb') as f:
+    #     f.write(dataset.to_json().encode())
 
     # Create a task dataset for each scene.
     for scene in scenes:
@@ -74,7 +74,7 @@ for split, size in splits:
         dataset.episodes = [e for e in generator]
 
         # Store scene dataset.
-        with gzip.open(path / split / 'content' / f'{scene}.json.gz', 'wb') as f:
+        with gzip.open(path / split / f'{split}.json.gz', 'wb') as f:
             f.write(dataset.to_json().encode())
 
         sim.close()
