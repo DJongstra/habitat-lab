@@ -39,4 +39,4 @@ TASK:
 DATASET:
   TYPE: PointNav-v1
   SPLIT: train
-  DATA_PATH: data/datasets/pointnav/room3x3/v0/{split}/{split}.json.gz
+  DATA_PATH: data/datasets/pointnav/room3x3/hall/{split}/{split}.json.gz

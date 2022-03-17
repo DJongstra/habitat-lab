@@ -194,3 +194,111 @@ def generate_pointnav_episode(
 
             episode_count += 1
             yield episode
+
+
+def generate_pointnav_episode_radius(
+    sim: "HabitatSim",
+    num_episodes: int = -1,
+    is_gen_shortest_path: bool = True,
+    shortest_path_success_distance: float = 0.2,
+    shortest_path_max_steps: int = 500,
+    closest_dist_limit: float = 1,
+    furthest_dist_limit: float = 30,
+    geodesic_to_euclid_min_ratio: float = 1.1,
+    number_retries_per_target: int = 10,
+    start: list = None,
+    end: list = None,
+    point_radius: int = 1
+) -> Generator[NavigationEpisode, None, None]:
+    """
+    :param start: forced starting point around given start
+    :param end: forced ending point around given end
+    :param point_radius: radius around start and end that are valid for generated points
+    """
+
+    if start is None or end is None:
+        return generate_pointnav_episode(num_episodes, is_gen_shortest_path,
+                                  shortest_path_success_distance,
+                                  shortest_path_max_steps,
+                                  closest_dist_limit, furthest_dist_limit,
+                                  geodesic_to_euclid_min_ratio,
+                                  number_retries_per_target)
+
+    # set the proper y values for 2D start and end parameter
+    pnt = sim.sample_navigable_point()
+    start = np.array([start[0], pnt[1], start[1]])
+    end = np.array([end[0], pnt[1], end[1]])
+
+    episode_count = 0
+    while episode_count < num_episodes or num_episodes < 0:
+        target_position = get_random_point_near(sim, end, point_radius)
+        print( "target:  ", target_position)
+        if target_position is None:
+            continue
+
+        # if sim.island_radius(target_position) < ISLAND_RADIUS_LIMIT:
+        #     continue
+
+        for _retry in range(number_retries_per_target):
+            source_position = get_random_point_near(sim, start, point_radius)
+            print("source:   ", source_position)
+            if source_position is None:
+                continue
+
+            is_compatible, dist = is_compatible_episode(
+                source_position,
+                target_position,
+                sim,
+                near_dist=closest_dist_limit,
+                far_dist=furthest_dist_limit,
+                geodesic_to_euclid_ratio=geodesic_to_euclid_min_ratio,
+            )
+            if is_compatible:
+                break
+        if is_compatible:
+            angle = np.random.uniform(0, 2 * np.pi)
+            source_rotation = [0, np.sin(angle / 2), 0, np.cos(angle / 2)]
+
+            shortest_paths = None
+            if is_gen_shortest_path:
+                try:
+                    shortest_paths = [
+                        get_action_shortest_path(
+                            sim,
+                            source_position=source_position,
+                            source_rotation=source_rotation,
+                            goal_position=target_position,
+                            success_distance=shortest_path_success_distance,
+                            max_episode_steps=shortest_path_max_steps,
+                        )
+                    ]
+                # Throws an error when it can't find a path
+                except GreedyFollowerError:
+                    continue
+
+            episode = _create_episode(
+                episode_id=episode_count,
+                scene_id=sim.habitat_config.SCENE,
+                start_position=source_position,
+                start_rotation=source_rotation,
+                target_position=target_position,
+                shortest_paths=shortest_paths,
+                radius=shortest_path_success_distance,
+                info={"geodesic_distance": dist},
+            )
+
+            episode_count += 1
+            yield episode
+
+def get_random_point_near(sim: "HabitatSim", center, radius, retries=200):
+    while retries > 0:
+        point = sim.sample_navigable_point()
+        distance = np.sqrt(
+            (center[0] - point[0]) ** 2
+            + (center[2] - point[2]) ** 2
+        )
+        print(distance)
+        if distance < radius:
+            return point
+        retries-=1
+

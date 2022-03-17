@@ -6,7 +6,7 @@ import habitat
 from habitat.config.default import _C
 from habitat.sims import make_sim
 
-from habitat.datasets.pointnav.pointnav_generator import generate_pointnav_episode
+from habitat.datasets.pointnav.pointnav_generator import generate_pointnav_episode, generate_pointnav_episode_radius
 
 parser = argparse.ArgumentParser(description='Create point goal navigation task dataset for The Beacon 3D scan data.')
 
@@ -18,15 +18,20 @@ parser.add_argument('--max-distance', default=30, type=int, help='Maximum shorte
 parser.add_argument('--max-steps', default=500, type=int, help='Maximum number of episode steps.')
 
 # Dataset split. Default values are based on the MP3D PointNav dataset in Habitat.
-parser.add_argument('--train-episodes', default=5000, type=int, help='Number of training episodes per scene.')
-parser.add_argument('--valid-episodes', default=50, type=int, help='Number of validation episodes per scene.')
-parser.add_argument('--test-episodes', default=150, type=int, help='Number of testing episodes per scene.')
+parser.add_argument('--train-episodes', default=1, type=int, help='Number of training episodes per scene.') # default = 5000
+parser.add_argument('--valid-episodes', default=1, type=int, help='Number of validation episodes per scene.') # default = 50
+parser.add_argument('--test-episodes', default=1, type=int, help='Number of testing episodes per scene.') # default = 150
 
 # Output folder.
-parser.add_argument('--output', default='./data/datasets/pointnav/room3x3/v0', help='Dataset root folder.')
+parser.add_argument('--output', default='./data/datasets/pointnav/room3x3/hall', help='Dataset root folder.')
 
 # Parse arguments.
 args = parser.parse_args()
+
+#
+radius = 2
+start = [0, -12]
+end = [0, 12]
 
 # Setup output folders.
 path = Path(args.output)
@@ -62,11 +67,14 @@ for split, size in splits:
         sim = make_sim(config.SIMULATOR.TYPE, config=config.SIMULATOR)
 
         # Setup episode generator.
-        generator = generate_pointnav_episode(
+        generator = generate_pointnav_episode_radius(
             sim,
             shortest_path_max_steps=max_steps,
             furthest_dist_limit=max_distance,
-            num_episodes=size
+            num_episodes=size,
+            start=start,
+            end=end,
+            point_radius=radius
         )
 
         # Create scene dataset.

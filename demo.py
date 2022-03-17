@@ -121,6 +121,8 @@ for i in range(len(env.episodes)):
         print("reward:  ", reward)
         count_steps += 1
 
+        agent_state = env._env._sim.get_agent_state()
+        print("position: ", agent_state.position)
         print(len(env.habitat_env.sim.people))
         for person in env.habitat_env.sim.people:
             print(person.object_id, person.current_position)
