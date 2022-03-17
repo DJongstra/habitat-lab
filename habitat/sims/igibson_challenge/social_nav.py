@@ -36,6 +36,7 @@ import quaternion
 import magnum as mn
 import math
 import numpy as np
+from habitat.sims.igibson_challenge.scenario import Scenario
 
 @registry.register_simulator(name="iGibsonSocialNav")
 class iGibsonSocialNav(HabitatSim):
@@ -52,6 +53,11 @@ class iGibsonSocialNav(HabitatSim):
         )
 
         self.obj_template_ids = obj_templates_mgr.load_configs("./meshes/simple_objects")
+        self.wall_id = obj_templates_mgr.load_configs("./meshes/walls")[0]
+        # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        # handle = obj_templates_mgr.get_file_template_handles(search_str="cylinder")[0]
+        # print(handle)
+        # print(obj_templates_mgr.get_template_id_by_handle(handle))
         self.person_ids = []
         self.people_mask = config.get('PEOPLE_MASK', False)
         self.num_people = config.get('NUM_PEOPLE', 1)
@@ -74,6 +80,10 @@ class iGibsonSocialNav(HabitatSim):
         self.num_objects = config.get('NUM_OBJECTS', 10)
 
 
+        # TODO
+        self.scenario = None
+
+
     def reset_objects_people(self, episode):
         obj_templates_mgr = self.get_object_template_manager()
 
@@ -92,7 +102,11 @@ class iGibsonSocialNav(HabitatSim):
                             self.people_template_ids)]))
                 people_count += 1
 
-        if self.force_around_path:
+        self.scenario = Scenario("./scenarios/testscene.json")
+        if self.scenario:
+            self.spawn_scenario()
+
+        elif self.force_around_path:
             spawn_points = self.get_spawn_points(episode)
             idx = self.spawn_objects_around_points(spawn_points)
             self.spawn_people_around_points(spawn_points, idx)
@@ -341,6 +355,41 @@ class iGibsonSocialNav(HabitatSim):
                 time_step=self.time_step,
             )
             self.people.append(spf)
+
+
+    def spawn_scenario(self):
+        self._scenario_spawn_walls()
+        self.spawn_people_random() # TODO
+
+    def _scenario_spawn_walls(self):
+        walls = self.scenario.walls
+        for wall in walls:
+            scale = wall["scale"]
+            spawnpoint = wall["spawnpoint"]
+            rotation = wall["rotation"]
+            print("scale: ", scale, " spawnpoint: ", spawnpoint)
+            obj_id = wall["obj_id"]
+
+            if obj_id is None:
+                obj_templates_mgr = self.get_object_template_manager()
+                wall_template = obj_templates_mgr.get_template_by_id(self.wall_id)
+                wall_template.scale = np.array([0.1, 1.0, scale])
+
+                wall = obj_templates_mgr.register_template(wall_template)
+
+                wall_id = self.add_object(wall)
+                self.set_translation([spawnpoint[0], 0.0, spawnpoint[1]], wall_id)
+                self.set_rotation(
+                    mn.Quaternion.rotation(mn.Rad(rotation),
+                                           np.array([0.0, 1.0, 0.0])),
+                    wall_id
+                )
+                self.set_object_motion_type(
+                    habitat_sim.physics.MotionType.STATIC,
+                    wall_id
+                )
+
+
 
 
 class ShortestPathFollowerv2:

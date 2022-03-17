@@ -1,0 +1,9 @@
+{
+    "render_asset": "wall2.obj",
+    "collision_asset": "wall2.obj",
+    "use_bounding_box_for_collision" : true,
+    "join_collision_meshes" : true,
+    "is_collidable": true,
+    "scale": [0.1,1.0,1.0],
+    "comment": "the wall is 1/10 the length of a wall in the room"
+}
