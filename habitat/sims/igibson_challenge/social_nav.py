@@ -367,7 +367,6 @@ class iGibsonSocialNav(HabitatSim):
             scale = wall["scale"]
             spawnpoint = wall["spawnpoint"]
             rotation = wall["rotation"]
-            print("scale: ", scale, " spawnpoint: ", spawnpoint)
             obj_id = wall["obj_id"]
 
             if obj_id is None:

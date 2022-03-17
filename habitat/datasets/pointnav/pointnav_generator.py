@@ -232,16 +232,14 @@ def generate_pointnav_episode_radius(
     episode_count = 0
     while episode_count < num_episodes or num_episodes < 0:
         target_position = get_random_point_near(sim, end, point_radius)
-        print( "target:  ", target_position)
         if target_position is None:
             continue
 
-        # if sim.island_radius(target_position) < ISLAND_RADIUS_LIMIT:
-        #     continue
+        if sim.island_radius(target_position) < ISLAND_RADIUS_LIMIT:
+            continue
 
         for _retry in range(number_retries_per_target):
             source_position = get_random_point_near(sim, start, point_radius)
-            print("source:   ", source_position)
             if source_position is None:
                 continue
 
@@ -297,7 +295,6 @@ def get_random_point_near(sim: "HabitatSim", center, radius, retries=200):
             (center[0] - point[0]) ** 2
             + (center[2] - point[2]) ** 2
         )
-        print(distance)
         if distance < radius:
             return point
         retries-=1

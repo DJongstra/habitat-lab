@@ -56,7 +56,6 @@ class Scenario:
             start = np.array(wall["start"])
             end = np.array(wall["end"])
             length = np.linalg.norm(start-end)
-            print("start: ", start, " end: ", end, "  length: ", length)
             scale = length/3.0
             spawnpoint = (start + end) / 2
 
@@ -65,12 +64,10 @@ class Scenario:
 
             p1 = np.array([0.0, 1.0])
             p2 = abs(start - end)
-            print(p2)
             p2 = p2 / np.linalg.norm(p2)
             dx = p2[0] - p1[0]
             dy = p2[1] - p1[1]
             theta = math.atan2(dy, dx)*2
-            print("THETA: ", theta)
 
             wall_info = {
                 "spawnpoint": spawnpoint,
