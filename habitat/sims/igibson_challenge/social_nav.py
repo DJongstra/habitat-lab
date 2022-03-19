@@ -86,12 +86,12 @@ class iGibsonSocialNav(HabitatSim):
 
     def reset_objects_people(self, episode):
         obj_templates_mgr = self.get_object_template_manager()
-
+        self.scenario = Scenario("./scenarios/testscene.json")
         for inst in self.get_existing_object_ids():
             self.remove_object(inst)
 
         # Check if humans have been erased (sim was reset)
-        if not self.get_existing_object_ids():
+        if not self.get_existing_object_ids() and self.scenario is None:
             self.person_ids = []
             people_count = 0
             first_person = np.random.randint(0, len(self.people_template_ids))
@@ -102,7 +102,7 @@ class iGibsonSocialNav(HabitatSim):
                             self.people_template_ids)]))
                 people_count += 1
 
-        self.scenario = Scenario("./scenarios/testscene.json")
+
         if self.scenario:
             self.spawn_scenario()
 
@@ -361,7 +361,6 @@ class iGibsonSocialNav(HabitatSim):
         self._scenario_spawn_walls()
         self._scenario_spawn_objects()
         self._scenario_spawn_people()
-        self.spawn_people_random() # TODO
 
     def _scenario_spawn_walls(self):
         walls = self.scenario.walls
@@ -415,7 +414,57 @@ class iGibsonSocialNav(HabitatSim):
             )
 
     def _scenario_spawn_people(self):
-        pass
+        self.people = []
+        pnt = np.array(self.sample_navigable_point())
+
+        for person in self.scenario.people:
+            person_template = np.random.randint(0, len(self.people_template_ids))
+            person_id = self.add_object(
+                self.people_template_ids[
+                    person_template])
+            self.person_ids.append(person_id)
+
+            start = np.array([person["start"][0], pnt[1], person["start"][1]]) #person["start"]
+            end = np.array([person["end"][0], pnt[1], person["end"][1]])
+            lin_speed = person["lin_speed"]
+            ang_speed = person["ang_speed"]
+            print(lin_speed, ang_speed)
+
+            waypoints = [start]
+
+            if lin_speed != 0.0 and ang_speed != 0.0:
+                print("here!")
+                sp = habitat_sim.nav.ShortestPath()
+                sp.requested_start = start
+                sp.requested_end = end
+                found_path = self.pathfinder.find_path(sp)
+
+                waypoints = sp.points
+
+            heading = np.random.rand() * 2 * np.pi - np.pi
+            rotation = np.quaternion(np.cos(heading), 0, np.sin(heading),
+                                     0)
+            rotation = np.normalized(rotation)
+            rotation = mn.Quaternion(
+                rotation.imag, rotation.real
+            )
+
+            self.set_translation([start[0], start[1] + 0.8, start[2]],
+                                 person_id)
+            self.set_rotation(rotation, person_id)
+            self.set_object_motion_type(
+                habitat_sim.physics.MotionType.KINEMATIC,
+                person_id
+            )
+            spf = ShortestPathFollowerv2(
+                sim=self,
+                object_id=person_id,
+                waypoints=waypoints,
+                lin_speed=lin_speed,
+                ang_speed=ang_speed,
+                time_step=self.time_step,
+            )
+            self.people.append(spf)
 
 
 

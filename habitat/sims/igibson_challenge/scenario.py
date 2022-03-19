@@ -56,7 +56,7 @@ class Scenario:
             self._set_wall_info(wall)
 
         for person in deserialized["people"]:
-            pass
+            self._set_people_info(person)
 
 
     def _set_wall_info(self, wall):
@@ -92,7 +92,23 @@ class Scenario:
         }
         self.objects.append(object_info)
 
+    def _set_people_info(self, person):
+        start = person["start"]
+        end = person["end"]
+        lin_speed = person["lin_speed"]
+        ang_speed = person["ang_speed"]
+        if start == end:
+            lin_speed = 0.0
+            ang_speed = 0.0
 
+        person_info = {
+            "start": start,
+            "end": end,
+            "lin_speed": lin_speed,
+            "ang_speed": ang_speed
+        }
+
+        self.people.append(person_info)
 
 
 
