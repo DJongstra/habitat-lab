@@ -49,33 +49,49 @@ class Scenario:
         f = open(filename, "r")
         deserialized = json.loads(f.read())
         #print(deserialized)
-        for ob in deserialized["people"]:
-            pass
+        for obj in deserialized["objects"]:
+            self._set_object_info(obj)
 
         for wall in deserialized["walls"]:
-            start = np.array(wall["start"])
-            end = np.array(wall["end"])
-            length = np.linalg.norm(start-end)
-            scale = length/3.0
-            spawnpoint = (start + end) / 2
+            self._set_wall_info(wall)
 
-            rotation = np.array([0.0, 0.0, 0.0])
+        for person in deserialized["people"]:
+            pass
 
 
-            p1 = np.array([0.0, 1.0])
-            p2 = abs(start - end)
-            p2 = p2 / np.linalg.norm(p2)
-            dx = p2[0] - p1[0]
-            dy = p2[1] - p1[1]
-            theta = math.atan2(dy, dx)*2
+    def _set_wall_info(self, wall):
+        start = np.array(wall["start"])
+        end = np.array(wall["end"])
+        length = np.linalg.norm(start - end)
+        scale = length / 3.0
+        spawnpoint = (start + end) / 2
 
-            wall_info = {
-                "spawnpoint": spawnpoint,
-                "scale": scale,
-                "rotation": theta,
-                "obj_id": None
-            }
-            self.walls.append(wall_info)
+        rotation = np.array([0.0, 0.0, 0.0])
+
+        p1 = np.array([0.0, 1.0])
+        p2 = abs(start - end)
+        p2 = p2 / np.linalg.norm(p2)
+        dx = p2[0] - p1[0]
+        dy = p2[1] - p1[1]
+        theta = math.atan2(dy, dx) * 2
+
+        wall_info = {
+            "spawnpoint": spawnpoint,
+            "scale": scale,
+            "rotation": theta
+        }
+        self.walls.append(wall_info)
+
+
+    def _set_object_info(self, obj):
+        position = np.array(obj["position"])
+        scale = np.array(obj["scale"])
+        object_info = {
+            "position": position,
+            "scale": scale
+        }
+        self.objects.append(object_info)
+
 
 
 

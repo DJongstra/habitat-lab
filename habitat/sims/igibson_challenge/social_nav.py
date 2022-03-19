@@ -359,6 +359,8 @@ class iGibsonSocialNav(HabitatSim):
 
     def spawn_scenario(self):
         self._scenario_spawn_walls()
+        self._scenario_spawn_objects()
+        self._scenario_spawn_people()
         self.spawn_people_random() # TODO
 
     def _scenario_spawn_walls(self):
@@ -367,26 +369,53 @@ class iGibsonSocialNav(HabitatSim):
             scale = wall["scale"]
             spawnpoint = wall["spawnpoint"]
             rotation = wall["rotation"]
-            obj_id = wall["obj_id"]
 
-            if obj_id is None:
-                obj_templates_mgr = self.get_object_template_manager()
-                wall_template = obj_templates_mgr.get_template_by_id(self.wall_id)
-                wall_template.scale = np.array([0.1, 1.0, scale])
+            obj_templates_mgr = self.get_object_template_manager()
+            wall_template = obj_templates_mgr.get_template_by_id(self.wall_id)
+            wall_template.scale = np.array([0.1, 1.0, scale])
 
-                wall = obj_templates_mgr.register_template(wall_template)
+            wall = obj_templates_mgr.register_template(wall_template)
 
-                wall_id = self.add_object(wall)
-                self.set_translation([spawnpoint[0], 0.0, spawnpoint[1]], wall_id)
-                self.set_rotation(
-                    mn.Quaternion.rotation(mn.Rad(rotation),
-                                           np.array([0.0, 1.0, 0.0])),
-                    wall_id
-                )
-                self.set_object_motion_type(
-                    habitat_sim.physics.MotionType.STATIC,
-                    wall_id
-                )
+            wall_id = self.add_object(wall)
+            self.set_translation([spawnpoint[0], 0.0, spawnpoint[1]], wall_id)
+            self.set_rotation(
+                mn.Quaternion.rotation(mn.Rad(rotation),
+                                       np.array([0.0, 1.0, 0.0])),
+                wall_id
+            )
+            self.set_object_motion_type(
+                habitat_sim.physics.MotionType.STATIC,
+                wall_id
+            )
+
+
+    def _scenario_spawn_objects(self):
+        self.objects = []
+        objects = self.scenario.objects
+        pnt = np.array(self.sample_navigable_point())
+
+        for obj in objects:
+            position = obj["position"]
+            scale = obj["scale"]
+            object_type = np.random.randint(0, len(self.obj_template_ids))
+
+            obj_templates_mgr = self.get_object_template_manager()
+            obj_template = obj_templates_mgr.get_template_by_id(self.obj_template_ids[object_type])
+            obj_template.scale = scale * obj_template.scale
+
+            obj_temp = obj_templates_mgr.register_template(obj_template)
+
+            obj = self.add_object(obj_temp)
+            pos = np.array([position[0], pnt[1], position[1]])
+            self.set_translation(pos, obj)
+
+            self.set_object_motion_type(
+                habitat_sim.physics.MotionType.STATIC,
+                obj
+            )
+
+    def _scenario_spawn_people(self):
+        pass
 
 
 
