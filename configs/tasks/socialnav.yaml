@@ -19,6 +19,7 @@ SIMULATOR:
   PEOPLE_ANG_SPEED: 0.0
   TIME_STEP: 1.0
   FORCE_AROUND_PATH: True
+  SCENARIO: "scenarios/testscene.json"
 TASK:
   TYPE: SocialNav-v0
   SUCCESS_DISTANCE: 0.2
@@ -39,4 +40,4 @@ TASK:
 DATASET:
   TYPE: PointNav-v1
   SPLIT: train
-  DATA_PATH: data/datasets/pointnav/room3x3/hall/{split}/{split}.json.gz
+  DATA_PATH: data/datasets/pointnav/room3x3/v0/{split}/{split}.json.gz

@@ -22,6 +22,8 @@ from habitat.sims import make_sim
 from habitat.tasks import make_task
 from habitat.utils import profiling_wrapper
 
+import json
+
 
 class Env:
     r"""Fundamental environment class for :ref:`habitat`.
@@ -74,6 +76,15 @@ class Env:
         self._config = config
         self._dataset = dataset
         self._current_episode_index = None
+        if "SCENARIO" in self._config.SIMULATOR: # alter datapath to one in scenario
+            f = open(self._config.SIMULATOR.SCENARIO, "r")
+            deserialized = json.loads(f.read())
+            f.close()
+            datapath = deserialized["data_path"]
+            self._config.defrost()
+            self._config.DATASET.DATA_PATH = datapath
+            self._config.freeze()
+
         if self._dataset is None and config.DATASET.TYPE:
             self._dataset = make_dataset(
                 id_dataset=config.DATASET.TYPE, config=config.DATASET

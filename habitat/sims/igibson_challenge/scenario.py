@@ -48,7 +48,7 @@ class Scenario:
     def read_scenario(self, filename):
         f = open(filename, "r")
         deserialized = json.loads(f.read())
-        #print(deserialized)
+        f.close()
         for obj in deserialized["objects"]:
             self._set_object_info(obj)
 

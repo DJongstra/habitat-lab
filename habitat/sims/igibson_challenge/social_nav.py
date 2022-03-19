@@ -81,14 +81,18 @@ class iGibsonSocialNav(HabitatSim):
 
 
         # TODO
-        self.scenario = None
+        self.scenario=None
+        scenariofile = config.get('SCENARIO', None)
+        if scenariofile:
+            self.scenario = Scenario(scenariofile)
 
 
     def reset_objects_people(self, episode):
         obj_templates_mgr = self.get_object_template_manager()
-        self.scenario = Scenario("./scenarios/testscene.json")
-        for inst in self.get_existing_object_ids():
-            self.remove_object(inst)
+
+        if self.scenario is None:
+            for inst in self.get_existing_object_ids():
+                self.remove_object(inst)
 
         # Check if humans have been erased (sim was reset)
         if not self.get_existing_object_ids() and self.scenario is None:
@@ -104,8 +108,8 @@ class iGibsonSocialNav(HabitatSim):
 
 
         if self.scenario:
-            self.spawn_scenario()
-
+            if not self.get_existing_object_ids():
+                self.spawn_scenario()
         elif self.force_around_path:
             spawn_points = self.get_spawn_points(episode)
             idx = self.spawn_objects_around_points(spawn_points)
@@ -428,12 +432,10 @@ class iGibsonSocialNav(HabitatSim):
             end = np.array([person["end"][0], pnt[1], person["end"][1]])
             lin_speed = person["lin_speed"]
             ang_speed = person["ang_speed"]
-            print(lin_speed, ang_speed)
 
             waypoints = [start]
 
             if lin_speed != 0.0 and ang_speed != 0.0:
-                print("here!")
                 sp = habitat_sim.nav.ShortestPath()
                 sp.requested_start = start
                 sp.requested_end = end

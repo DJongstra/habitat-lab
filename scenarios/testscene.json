@@ -1,5 +1,6 @@
 { 
   "comment": "Scene is normally defined in yaml, but maybe good to also define in this file to see what it is compatible with",
+  "data_path": "./scenarios/datasets/hall/{split}/{split}.json.gz",
   "objects": [
     {
       "name": "cylinder",
