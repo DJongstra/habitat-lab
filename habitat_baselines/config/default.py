@@ -12,6 +12,8 @@ import numpy as np
 from habitat import get_config as get_task_config
 from habitat.config import Config as CN
 
+import json
+
 DEFAULT_CONFIG_DIR = "configs/"
 CONFIG_FILE_SEPARATOR = ","
 # -----------------------------------------------------------------------------
@@ -245,6 +247,15 @@ def get_config(
                 config.BASE_TASK_CONFIG_PATH = v
 
     config.TASK_CONFIG = get_task_config(config.BASE_TASK_CONFIG_PATH)
+    if 'SCENARIO' in config.TASK_CONFIG.SIMULATOR:  # set datapath to defined in scenario
+        f = open(config.TASK_CONFIG.SIMULATOR.SCENARIO, "r")
+        deserialized = json.loads(f.read())
+        f.close()
+        datapath = deserialized["data_path"]
+        config.TASK_CONFIG.defrost()
+        config.TASK_CONFIG.DATASET.DATA_PATH = datapath
+        config.TASK_CONFIG.freeze()
+
     if opts:
         config.CMD_TRAILING_OPTS = config.CMD_TRAILING_OPTS + opts
         config.merge_from_list(config.CMD_TRAILING_OPTS)

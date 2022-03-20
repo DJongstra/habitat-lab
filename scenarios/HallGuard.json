@@ -2,11 +2,6 @@
   "comment": "scene is room3x3, which is a square room with the lower left corner at (-15,-15) and upper right corner at (15,15)",
   "data_path": "./scenarios/datasets/hall/{split}/{split}.json.gz",
   "objects": [
-    {
-      "name": "cylinder",
-      "position": [0,1],
-      "scale": [1.0,1.0,1.0]
-    }
   ],
   "people": [
     {
@@ -14,12 +9,6 @@
       "end": [1.8,0],
       "lin_speed": 0.25,
       "ang_speed": 10.0
-    },
-    {
-      "start": [10,0],
-      "end": [10,0],
-      "lin_speed": 0.0,
-      "ang_speed": 0.0
     }
   ],
   "walls": [

@@ -119,11 +119,12 @@ class iGibsonSocialNav(HabitatSim):
             self.spawn_objects_random()
             self.spawn_people_random()
 
-        navmesh_settings = habitat_sim.NavMeshSettings()
-        navmesh_settings.set_defaults()
-        navmesh_success = self.recompute_navmesh(
-            self.pathfinder, navmesh_settings, include_static_objects=True
-        )
+        if not self.scenario:
+            navmesh_settings = habitat_sim.NavMeshSettings()
+            navmesh_settings.set_defaults()
+            navmesh_success = self.recompute_navmesh(
+                self.pathfinder, navmesh_settings, include_static_objects=True
+            )
 
 
     def get_observations_at(
@@ -365,6 +366,12 @@ class iGibsonSocialNav(HabitatSim):
         self._scenario_spawn_walls()
         self._scenario_spawn_objects()
         self._scenario_spawn_people()
+
+        navmesh_settings = habitat_sim.NavMeshSettings()
+        navmesh_settings.set_defaults()
+        navmesh_success = self.recompute_navmesh(
+            self.pathfinder, navmesh_settings, include_static_objects=True
+        )
 
     def _scenario_spawn_walls(self):
         walls = self.scenario.walls

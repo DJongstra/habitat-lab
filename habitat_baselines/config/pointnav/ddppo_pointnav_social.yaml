@@ -1,4 +1,4 @@
-BASE_TASK_CONFIG_PATH: "configs/tasks/socialnav.yaml"
+BASE_TASK_CONFIG_PATH: "configs/tasks/socialnav-scenario.yaml"
 
 ENV_NAME: "NavRLEnv"
 
