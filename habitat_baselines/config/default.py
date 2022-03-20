@@ -82,6 +82,7 @@ _C.RL.MAX_LIN_ACCEL_PENALTY = 0.0
 _C.RL.DIRECTION_CHANGE_PENALTY = 0.0
 _C.RL.PROXIMITY_PENALTY = 0.0   # maximum penalty for close proximity
 _C.RL.PROXIMITY_COEFFICIENT = 0.15
+_C.RL.PROXIMITY_PENALTY_TYPE = "exp" # exp(onential) or const(ant)
 # -----------------------------------------------------------------------------
 # DATA AUGMENTATION CONFIG
 # -----------------------------------------------------------------------------

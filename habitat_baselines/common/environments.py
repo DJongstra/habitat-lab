@@ -92,9 +92,13 @@ class NavRLEnv(habitat.RLEnv):
                         (p.current_position[0]-agent_pos[0])**2
                         +(p.current_position[2]-agent_pos[2])**2
                     )
-                    if distance < self._rl_config.get('PENALTY_RADIUS', 3.6):
+                    if self._rl_config.get('PROXIMITY_PENALTY_TYPE', "exp") == "exp" \
+                        and distance < self._rl_config.get('PENALTY_RADIUS', 3.6):
                         reward -= pow(proximity_coeff, distance-0.2)*proximity_penalty
                         break
+                    elif self._rl_config.get('PROXIMITY_PENALTY_TYPE', "exp") == "const" \
+                        and distance < self._rl_config.get('PENALTY_RADIUS', 1.5):
+                        reward -= proximity_penalty
         self._previous_measure = current_measure
 
         if self._episode_success():
