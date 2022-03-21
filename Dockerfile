@@ -85,8 +85,9 @@ ADD habitat_baselines/config/pointnav/ddppo_pointnav_social.yaml /habitat-lab/ha
 ADD configs/tasks/socialnav-nomap.yaml /habitat-lab/configs/tasks/
 ADD habitat_baselines/config/pointnav/ddppo_pointnav_social-novid.yaml /habitat-lab/habitat_baselines/config/pointnav/
 
-# Add config for scenarios
+# Add configs for scenarios
 ADD configs/tasks/socialnav-scenario.yaml /habitat-lab/configs/tasks/
+ADD scenarios/datasets /habitat-lab/scenarios/datasets
 
 # Add experiment scripts.
 ADD train.sh /

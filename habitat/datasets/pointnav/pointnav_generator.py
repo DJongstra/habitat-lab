@@ -231,17 +231,21 @@ def generate_pointnav_episode_radius(
 
     episode_count = 0
     while episode_count < num_episodes or num_episodes < 0:
-        target_position = get_random_point_near(sim, end, point_radius)
-        if target_position is None:
-            continue
+        target_position = end
+        if point_radius > 0:
+            target_position = get_random_point_near(sim, end, point_radius)
+            if target_position is None:
+                continue
 
         if sim.island_radius(target_position) < ISLAND_RADIUS_LIMIT:
             continue
 
         for _retry in range(number_retries_per_target):
-            source_position = get_random_point_near(sim, start, point_radius)
-            if source_position is None:
-                continue
+            source_position = start
+            if point_radius > 0:
+                source_position = get_random_point_near(sim, start, point_radius)
+                if source_position is None:
+                    continue
 
             is_compatible, dist = is_compatible_episode(
                 source_position,
@@ -255,6 +259,8 @@ def generate_pointnav_episode_radius(
                 break
         if is_compatible:
             angle = np.random.uniform(0, 2 * np.pi)
+            if point_radius == 0:
+                angle = np.pi
             source_rotation = [0, np.sin(angle / 2), 0, np.cos(angle / 2)]
 
             shortest_paths = None

@@ -18,18 +18,18 @@ parser.add_argument('--max-distance', default=30, type=int, help='Maximum shorte
 parser.add_argument('--max-steps', default=500, type=int, help='Maximum number of episode steps.')
 
 # Dataset split. Default values are based on the MP3D PointNav dataset in Habitat.
-parser.add_argument('--train-episodes', default=50, type=int, help='Number of training episodes per scene.') # default = 5000
-parser.add_argument('--valid-episodes', default=20, type=int, help='Number of validation episodes per scene.') # default = 50
-parser.add_argument('--test-episodes', default=20, type=int, help='Number of testing episodes per scene.') # default = 150
+parser.add_argument('--train-episodes', default=1, type=int, help='Number of training episodes per scene.') # default = 5000
+parser.add_argument('--valid-episodes', default=1, type=int, help='Number of validation episodes per scene.') # default = 50
+parser.add_argument('--test-episodes', default=1, type=int, help='Number of testing episodes per scene.') # default = 150
 
 # Output folder.
-parser.add_argument('--output', default='./data/datasets/pointnav/room3x3/hall', help='Dataset root folder.')
+parser.add_argument('--output', default='./scenarios/datasets/hall2', help='Dataset root folder.')
 
 # Parse arguments.
 args = parser.parse_args()
 
 #
-radius = 2
+radius = 0
 start = [0, -12]
 end = [0, 12]
 

@@ -78,6 +78,9 @@ none_action = {
 cv2.namedWindow("social-navigation")
 
 config = get_config(config_paths='habitat_baselines/config/pointnav/ddppo_pointnav_social.yaml')
+config.defrost()
+config.TASK_CONFIG.TASK.MEASUREMENTS.append("SOCIAL_TOP_DOWN_MAP")
+config.freeze()
 env = habitat_baselines.common.environments.NavRLEnv(config=config)
 
 max_steps = 1000

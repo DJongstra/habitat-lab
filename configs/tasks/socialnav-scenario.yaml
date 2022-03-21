@@ -19,7 +19,7 @@ SIMULATOR:
   PEOPLE_ANG_SPEED: 0.0
   TIME_STEP: 1.0
   FORCE_AROUND_PATH: False
-  SCENARIO: "./scenarios/HallGuard.json"
+  SCENARIO: "./scenarios/CrowdNavigation.json"
 TASK:
   TYPE: SocialNav-v0
   SUCCESS_DISTANCE: 0.2
