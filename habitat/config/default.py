@@ -216,6 +216,16 @@ _C.TASK.OBJECT_DISTANCE.TYPE = "ObjectDistance"
 _C.TASK.PATH_IRREGULARITY = CN()
 _C.TASK.PATH_IRREGULARITY.TYPE = "PathIrregularity"
 # -----------------------------------------------------------------------------
+# NUM_STEPS MEASUREMENT
+# -----------------------------------------------------------------------------
+_C.TASK.NUM_STEPS = CN()
+_C.TASK.NUM_STEPS.TYPE = "NumSteps"
+# -----------------------------------------------------------------------------
+# CLOSEST_DISTANCE_TO_GOAL MEASUREMENT
+# -----------------------------------------------------------------------------
+_C.TASK.CLOSEST_DISTANCE_TO_GOAL = CN()
+_C.TASK.CLOSEST_DISTANCE_TO_GOAL.TYPE = "ClosestDistanceToGoal"
+# -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 # # EQA TASK
 # -----------------------------------------------------------------------------

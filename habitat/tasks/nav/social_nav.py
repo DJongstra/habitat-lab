@@ -6,7 +6,7 @@ from habitat.config import Config
 from habitat.core.dataset import Episode
 from habitat.core.embodied_task import EmbodiedTask, Measure
 from habitat.core.registry import registry
-from habitat.tasks.nav.nav import NavigationTask, TopDownMap
+from habitat.tasks.nav.nav import NavigationTask, TopDownMap, DistanceToGoal
 from habitat.utils.visualizations import maps
 from habitat.tasks.utils import cartesian_to_polar
 from habitat.utils.geometry_utils import (
@@ -201,14 +201,6 @@ class ObjectDistance(Measure):
         if self.min_distance is None or distance < self.min_distance:
             self.min_distance = distance
 
-        # if self._metric is None:
-        #     self._metric = {
-        #         "distance": distance,
-        #         "min_distance": self.min_distance
-        #     }
-        # else:
-        #     self._metric["distance"] = distance
-        #     self._metric["min_distance"] = self.min_distance
         self._metric = self.min_distance
 
 
@@ -326,3 +318,69 @@ class PathIrregularity(Measure):
 
 
 
+@registry.register_measure
+class NumSteps(Measure):
+    """
+    Measure for the distance of the agent to the closest object
+    - self._metric["distance"] are the distances of all steps during an episode
+     to the closest object
+    - self._metric["min_distance"] is the minimal distance kept to objects
+     during an episode
+    """
+
+    def __init__(
+        self, sim: "HabitatSim", config: Config, *args: Any, **kwargs: Any
+    ):
+        self._sim = sim
+        self._config = config
+        self.uuid = "num_steps"
+
+    def _get_uuid(self, *args: Any, **kwargs: Any) -> str:
+        return "num_steps"
+
+    def reset_metric(self, episode, *args: Any, **kwargs: Any):
+        self._metric = 0
+
+    def update_metric(
+        self,
+        episode,
+        task: EmbodiedTask,
+        *args: Any,
+        **kwargs: Any
+    ):
+        self._metric += 1
+
+@registry.register_measure
+class ClosestDistanceToGoal(Measure):
+    """
+    Measure for the distance of the agent to the closest object
+    - self._metric["distance"] are the distances of all steps during an episode
+     to the closest object
+    - self._metric["min_distance"] is the minimal distance kept to objects
+     during an episode
+    """
+
+    def __init__(
+        self, sim: "HabitatSim", config: Config, *args: Any, **kwargs: Any
+    ):
+        self._sim = sim
+        self._config = config
+        self.uuid = "closest_distance_to_goal"
+
+    def _get_uuid(self, *args: Any, **kwargs: Any) -> str:
+        return "closest_distance_to_goal"
+
+    def reset_metric(self, episode, *args: Any, **kwargs: Any):
+        self._metric = None
+
+    def update_metric(
+        self,
+        episode,
+        task: EmbodiedTask,
+        *args: Any,
+        **kwargs: Any
+    ):
+        distance = task.measurements.measures[DistanceToGoal.cls_uuid].get_metric()
+
+        if self._metric is None or distance < self._metric:
+            self._metric = distance
