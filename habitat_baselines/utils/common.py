@@ -37,6 +37,8 @@ from habitat.utils import profiling_wrapper
 from habitat.utils.visualizations.utils import images_to_video
 from habitat_baselines.common.tensor_dict import DictTree, TensorDict
 from habitat_baselines.common.tensorboard_utils import TensorboardWriter
+import matplotlib.pyplot as plt
+
 
 cv2 = try_cv2_import()
 
@@ -283,6 +285,7 @@ def generate_video(
     metrics: Dict[str, float],
     tb_writer: TensorboardWriter,
     fps: int = 10,
+    speedlist: [float] = []
 ) -> None:
     r"""Generate video according to specified information.
 
@@ -311,6 +314,7 @@ def generate_video(
         "path_irregularity.ang_accel": "ang_accel",
         "path_irregularity.lin_accel": "lin_accel",
         "path_irregularity.direction_change": "direction_change",
+        "path_irregularity.lin_speed": "lin_speed",
         "people_positioning.min_distance": "people_min_dist",
         "collisions.count": "collisions",
         "closest_distance_to_goal": "closestTG"
@@ -325,6 +329,13 @@ def generate_video(
         if k in rename:
             k = rename[k]
         metric_strs.append(f"{k}={v:.2f}")
+
+    if not speedlist == []:
+        if not os.path.exists( video_dir + "/figures"):
+            os.makedirs( video_dir + "/figures")
+        plt.plot(speedlist, color='green')
+        plt.savefig( video_dir + "/figures/" + f"episode={episode_id}-ckpt={checkpoint_idx}")
+
 
     # forcefully limit the amount of characters spend on metrics in file name
     metric_strs = "-".join(metric_strs)

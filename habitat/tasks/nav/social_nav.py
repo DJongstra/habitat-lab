@@ -14,6 +14,7 @@ from habitat.utils.geometry_utils import (
     quaternion_rotate_vector,
 )
 from habitat_sim.utils.common import quat_from_magnum, angle_between_quats
+from statistics import mean
 
 @registry.register_task(name="SocialNav-v0")
 class SocialNavigationTask(NavigationTask):
@@ -292,10 +293,13 @@ class PathIrregularity(Measure):
         return "path_irregularity"
 
     def reset_metric(self, episode, *args: Any, **kwargs: Any):
+        self.lin_speeds = []
         self._metric = {
             "direction_change": 0,
             "ang_accel": 0.0,
-            "lin_accel": 0.0
+            "lin_accel": 0.0,
+            "lin_speed": 0.0,
+            "speed_list": []
         }
 
     def update_metric(
@@ -310,10 +314,14 @@ class PathIrregularity(Measure):
             return
         ang_accel = observations["ang_accel"]
         lin_accel = observations["lin_accel"]
+        lin_speed = observations["lin_speed"]
 
         self._metric["direction_change"] += observations["change_direction"]
         self._metric["ang_accel"] = abs(ang_accel)
         self._metric["lin_accel"] = abs(lin_accel)
+        self.lin_speeds.append(lin_speed)
+        self._metric["lin_speed"] = mean(self.lin_speeds)
+        self._metric["speed_list"] = self.lin_speeds
 
 
 
