@@ -312,13 +312,15 @@ def generate_video(
         "path_irregularity.lin_accel": "lin_accel",
         "path_irregularity.direction_change": "direction_change",
         "people_positioning.min_distance": "people_min_dist",
-        "collisions.count": "collisions"
-
+        "collisions.count": "collisions",
+        "closest_distance_to_goal": "closestTG"
     }
 
     metric_strs = []
     for k, v in metrics.items():
         if k in leave_out_name:
+            continue
+        if np.isnan(v):
             continue
         if k in rename:
             k = rename[k]
