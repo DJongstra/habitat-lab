@@ -333,8 +333,10 @@ def generate_video(
     if not speedlist == []:
         if not os.path.exists( video_dir + "/figures"):
             os.makedirs( video_dir + "/figures")
-        plt.plot(speedlist, color='green')
+        plt.figure()
+        plt.plot(speedlist)
         plt.savefig( video_dir + "/figures/" + f"episode={episode_id}-ckpt={checkpoint_idx}")
+        plt.close()
 
 
     # forcefully limit the amount of characters spend on metrics in file name
