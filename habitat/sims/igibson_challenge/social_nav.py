@@ -423,6 +423,7 @@ class iGibsonSocialNav(HabitatSim):
                 habitat_sim.physics.MotionType.STATIC,
                 obj
             )
+            self.objects.append(obj)
 
     def _scenario_spawn_people(self):
         self.people = []
