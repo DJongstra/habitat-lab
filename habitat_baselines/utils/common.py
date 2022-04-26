@@ -285,7 +285,8 @@ def generate_video(
     metrics: Dict[str, float],
     tb_writer: TensorboardWriter,
     fps: int = 10,
-    speedlist: [float] = []
+    speedlist: [float] = [],
+    anglist: [float] = []
 ) -> None:
     r"""Generate video according to specified information.
 
@@ -333,11 +334,26 @@ def generate_video(
     if not speedlist == []:
         if not os.path.exists( video_dir + "/figures"):
             os.makedirs( video_dir + "/figures")
+        if not os.path.exists( video_dir + "/figures/lin"):
+            os.makedirs( video_dir + "/figures/lin")
         plt.figure()
         plt.plot(speedlist)
-        plt.savefig( video_dir + "/figures/" + f"episode={episode_id}-ckpt={checkpoint_idx}")
+        plt.xlabel("Steps")
+        plt.ylabel("Linear speed")
+        plt.title("Linear speed over time")
+        plt.savefig( video_dir + "/figures/lin/" + f"episode={episode_id}-ckpt={checkpoint_idx}")
         plt.close()
 
+    if not anglist == []:
+        if not os.path.exists( video_dir + "/figures/ang"):
+            os.makedirs( video_dir + "/figures/ang")
+        plt.figure()
+        plt.plot(anglist)
+        plt.xlabel("Steps")
+        plt.ylabel("Angular speed")
+        plt.title("Angular speed over time")
+        plt.savefig( video_dir + "/figures/ang/" + f"episode={episode_id}-ckpt={checkpoint_idx}")
+        plt.close()
 
     # forcefully limit the amount of characters spend on metrics in file name
     metric_strs = "-".join(metric_strs)

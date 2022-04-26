@@ -294,12 +294,14 @@ class PathIrregularity(Measure):
 
     def reset_metric(self, episode, *args: Any, **kwargs: Any):
         self.lin_speeds = []
+        self.ang_speeds = []
         self._metric = {
             "direction_change": 0,
             "ang_accel": 0.0,
             "lin_accel": 0.0,
             "lin_speed": 0.0,
-            "speed_list": []
+            "speed_list": [],
+            "ang_list": []
         }
 
     def update_metric(
@@ -313,6 +315,7 @@ class PathIrregularity(Measure):
         if not ("ang_accel" in observations or  "lin_accel" in observations):
             return
         ang_accel = observations["ang_accel"]
+        ang_speed = observations["ang_speed"]
         lin_accel = observations["lin_accel"]
         lin_speed = observations["lin_speed"]
 
@@ -320,8 +323,10 @@ class PathIrregularity(Measure):
         self._metric["ang_accel"] = abs(ang_accel)
         self._metric["lin_accel"] = abs(lin_accel)
         self.lin_speeds.append(lin_speed)
+        self.ang_speeds.append(ang_speed)
         self._metric["lin_speed"] = mean(self.lin_speeds)
         self._metric["speed_list"] = self.lin_speeds
+        self._metric["ang_list"] = self.ang_speeds
 
 
 

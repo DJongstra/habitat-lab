@@ -447,7 +447,7 @@ class PPOTrainer(BaseRLTrainer):
                         if (k + "." + subk) not in cls.METRICS_BLACKLIST
                     }
                 )
-            elif k == "speed_list":
+            elif k == "speed_list" or k == "ang_list":  # lists to make graphs over episodes
                 pass
             # Things that are scalar-like will have an np.size of 1.
             # Strings also have an np.size of 1, so explicitly ban those
@@ -1235,8 +1235,10 @@ class PPOTrainer(BaseRLTrainer):
                     ] = episode_stats
                     if len(self.config.VIDEO_OPTION) > 0:
                         speedlist = []
+                        anglist = []
                         if "path_irregularity" in infos[i]:
-                            speedlist = speedlist
+                            speedlist = infos[i]["path_irregularity"]["speed_list"]
+                            anglist = infos[i]["path_irregularity"]["ang_list"]
 
 
                         generate_video(
@@ -1248,7 +1250,8 @@ class PPOTrainer(BaseRLTrainer):
                             metrics=self._extract_scalars_from_info(infos[i]),
                             tb_writer=writer,
                             fps=30,
-                            speedlist=infos[i]["path_irregularity"]["speed_list"]
+                            speedlist=speedlist,
+                            anglist=anglist,
                         )
 
                     rgb_frames[i] = []
