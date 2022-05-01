@@ -95,7 +95,7 @@ class NavRLEnv(habitat.RLEnv):
                     if self._rl_config.get('PROXIMITY_PENALTY_TYPE', "exp") == "exp" \
                         and distance < self._rl_config.get('PENALTY_RADIUS', 3.6):
                         reward -= pow(proximity_coeff, distance-0.2)*proximity_penalty
-                        break
+                        
                     elif self._rl_config.get('PROXIMITY_PENALTY_TYPE', "exp") == "const" \
                         and distance < self._rl_config.get('PENALTY_RADIUS', 1.5):
                         reward -= proximity_penalty
