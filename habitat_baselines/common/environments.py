@@ -92,13 +92,26 @@ class NavRLEnv(habitat.RLEnv):
                         (p.current_position[0]-agent_pos[0])**2
                         +(p.current_position[2]-agent_pos[2])**2
                     )
-                    if self._rl_config.get('PROXIMITY_PENALTY_TYPE', "exp") == "exp" \
-                        and distance < self._rl_config.get('PENALTY_RADIUS', 3.6):
-                        reward -= pow(proximity_coeff, distance-0.2)*proximity_penalty
-                        
-                    elif self._rl_config.get('PROXIMITY_PENALTY_TYPE', "exp") == "const" \
-                        and distance < self._rl_config.get('PENALTY_RADIUS', 1.5):
-                        reward -= proximity_penalty
+                    prox_type = self._rl_config.get('PROXIMITY_PENALTY_TYPE', "exp") # get type of penalty from configuration, either constant or exponential
+                    penalty_radius = 1.0    # penalty radius variable, this is properly set in the proximity type if/else statements that follow
+                    if  prox_type == "exp":
+                        penalty_radius = self._rl_config.get('PENALTY_RADIUS', 3.6)
+                        if distance < penalty_radius:
+                            reward -= pow(proximity_coeff, distance-0.2)*proximity_penalty
+
+                    elif prox_type == "const":
+                        penalty_radius = self._rl_config.get('PENALTY_RADIUS', 1.5)
+                        if distance < penalty_radius:
+                            reward -= proximity_penalty
+
+                    speed_penalty = self._rl_config.get('SPEED_PENALTY', 0.0)
+
+                    if speed_penalty > 0.0 and \
+                        distance < proximity_penalty and \
+                        "lin_speed" in observations:
+                        lin_speed = abs(observations['lin_speed'])
+                        reward -= speed_penalty * (penalty_radius-i)/penalty_radius * lin_speed
+
         self._previous_measure = current_measure
 
         if self._episode_success():
