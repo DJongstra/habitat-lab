@@ -3,7 +3,7 @@ ENVIRONMENT:
 SIMULATOR:
   TYPE: "iGibsonSocialNav"
   AGENT_0:
-    SENSORS: ['RGB_SENSOR']
+    SENSORS: ['RGB_SENSOR', 'DEPTH_SENSOR']
   HABITAT_SIM_V0:
     GPU_DEVICE_ID: 0
     ALLOW_SLIDING: True # True or False, enables the robot to move by sliding alongside a wall
@@ -19,7 +19,7 @@ SIMULATOR:
   PEOPLE_ANG_SPEED: 0.0
   TIME_STEP: 1.0
   FORCE_AROUND_PATH: False
-  SCENARIO: "./scenarios/HallObject.json"
+  SCENARIO: "./scenarios/HallForce3.json"
 TASK:
   TYPE: SocialNav-v0
   SUCCESS_DISTANCE: 0.2
