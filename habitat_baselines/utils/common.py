@@ -286,7 +286,8 @@ def generate_video(
     tb_writer: TensorboardWriter,
     fps: int = 10,
     speedlist: [float] = [],
-    anglist: [float] = []
+    anglist: [float] = [],
+    allRewards: [float] = []
 ) -> None:
     r"""Generate video according to specified information.
 
@@ -353,6 +354,17 @@ def generate_video(
         plt.ylabel("Angular speed")
         plt.title("Angular speed over time")
         plt.savefig( video_dir + "/figures/ang/" + f"episode={episode_id}-ckpt={checkpoint_idx}")
+        plt.close()
+
+    if not allRewards == []:
+        if not os.path.exists( video_dir + "/figures/rew"):
+            os.makedirs( video_dir + "/figures/rew")
+        plt.figure()
+        plt.plot(allRewards)
+        plt.xlabel("Steps")
+        plt.ylabel("Reward")
+        plt.title("Reward over time")
+        plt.savefig( video_dir + "/figures/rew/" + f"episode={episode_id}-ckpt={checkpoint_idx}")
         plt.close()
 
     # forcefully limit the amount of characters spend on metrics in file name

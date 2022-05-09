@@ -1089,6 +1089,7 @@ class PPOTrainer(BaseRLTrainer):
         current_episode_reward = torch.zeros(
             self.envs.num_envs, 1, device="cpu"
         )
+        current_episode_all_rewards = []
 
         test_recurrent_hidden_states = torch.zeros(
             self.config.NUM_ENVIRONMENTS,
@@ -1201,6 +1202,7 @@ class PPOTrainer(BaseRLTrainer):
                 rewards_l, dtype=torch.float, device="cpu"
             ).unsqueeze(1)
             current_episode_reward += rewards
+            current_episode_all_rewards.append(current_episode_reward.numpy()[0][0])
             next_episodes = self.envs.current_episodes()
             envs_to_pause = []
             n_envs = self.envs.num_envs
@@ -1239,7 +1241,8 @@ class PPOTrainer(BaseRLTrainer):
                         if "path_irregularity" in infos[i]:
                             speedlist = infos[i]["path_irregularity"]["speed_list"]
                             anglist = infos[i]["path_irregularity"]["ang_list"]
-
+                        if self.envs.num_envs > 1:
+                            current_episode_all_rewards = []
 
                         generate_video(
                             video_option=self.config.VIDEO_OPTION,
@@ -1252,6 +1255,7 @@ class PPOTrainer(BaseRLTrainer):
                             fps=30,
                             speedlist=speedlist,
                             anglist=anglist,
+                            allRewards = current_episode_all_rewards
                         )
 
                     rgb_frames[i] = []
