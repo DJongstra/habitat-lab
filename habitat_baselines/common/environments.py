@@ -85,8 +85,9 @@ class NavRLEnv(habitat.RLEnv):
         if 'PROXIMITY_PENALTY' in self._rl_config:
             proximity_penalty = self._rl_config.PROXIMITY_PENALTY
             proximity_coeff = self._rl_config.PROXIMITY_COEFFICIENT
+            speed_penalty = self._rl_config.get('SPEED_PENALTY', 0.0)
             agent_pos = sim.get_agent_state().position
-            if sim.social_nav and proximity_penalty != 0: # only run if penalty different from 0 specified
+            if sim.social_nav and (proximity_penalty != 0 or speed_penalty != 0): # only run if penalty different from 0 specified
                 for p in sim.people:
                     distance = np.sqrt(
                         (p.current_position[0]-agent_pos[0])**2
@@ -106,11 +107,16 @@ class NavRLEnv(habitat.RLEnv):
 
                     speed_penalty = self._rl_config.get('SPEED_PENALTY', 0.0)
 
+                    print(speed_penalty)
+                    print(distance)
+                    print("lin_speed" in observations)
                     if speed_penalty > 0.0 and \
-                        distance < proximity_penalty and \
+                        distance < penalty_radius and \
                         "lin_speed" in observations:
                         lin_speed = abs(observations['lin_speed'])
-                        reward -= speed_penalty * (penalty_radius-i)/penalty_radius * lin_speed
+                        print("Speed penalty: ")
+                        print(speed_penalty * (penalty_radius-distance)/penalty_radius * lin_speed)
+                        reward -= speed_penalty * (penalty_radius-distance)/penalty_radius * lin_speed
 
         self._previous_measure = current_measure
 
