@@ -95,21 +95,21 @@ class NavRLEnv(habitat.RLEnv):
                     )
                     prox_type = self._rl_config.get('PROXIMITY_PENALTY_TYPE', "exp") # get type of penalty from configuration, either constant or exponential
                     penalty_radius = 1.0    # penalty radius variable, this is properly set in the proximity type if/else statements that follow
-                    if  prox_type == "exp":
+                    if  prox_type == "exp" and proximity_penalty != 0:
                         penalty_radius = self._rl_config.get('PENALTY_RADIUS', 3.6)
                         if distance < penalty_radius:
                             reward -= pow(proximity_coeff, distance-0.2)*proximity_penalty
 
-                    elif prox_type == "const":
+                    elif prox_type == "const" and proximity_penalty != 0:
                         penalty_radius = self._rl_config.get('PENALTY_RADIUS', 1.5)
                         if distance < penalty_radius:
                             reward -= proximity_penalty
 
                     speed_penalty = self._rl_config.get('SPEED_PENALTY', 0.0)
 
-                    print(speed_penalty)
-                    print(distance)
-                    print("lin_speed" in observations)
+                    #print(speed_penalty)
+                    #print(distance)
+                    #print("lin_speed" in observations)
                     if speed_penalty > 0.0 and \
                         distance < penalty_radius and \
                         "lin_speed" in observations:
