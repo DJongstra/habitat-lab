@@ -94,29 +94,33 @@ class NavRLEnv(habitat.RLEnv):
                         +(p.current_position[2]-agent_pos[2])**2
                     )
                     prox_type = self._rl_config.get('PROXIMITY_PENALTY_TYPE', "exp") # get type of penalty from configuration, either constant or exponential
-                    penalty_radius = 1.0    # penalty radius variable, this is properly set in the proximity type if/else statements that follow
-                    if  prox_type == "exp" and proximity_penalty != 0:
-                        penalty_radius = self._rl_config.get('PENALTY_RADIUS', 3.6)
-                        if distance < penalty_radius:
+                    penalty_radius = 1.0   # penalty radius variable, this is properly set in the proximity type if/else statements that follow
+                    if  prox_type == "exp":
+                        penalty_radius = self._rl_config.get('PENALTY_RADIUS', 3.6) # set penalty radius
+                        if proximity_penalty != 0 and distance < penalty_radius:
                             reward -= pow(proximity_coeff, distance-0.2)*proximity_penalty
 
-                    elif prox_type == "const" and proximity_penalty != 0:
-                        penalty_radius = self._rl_config.get('PENALTY_RADIUS', 1.5)
-                        if distance < penalty_radius:
+                    elif prox_type == "const":
+                        penalty_radius = self._rl_config.get('PENALTY_RADIUS', 1.5) # set penalty radius
+                        if proximity_penalty != 0 and distance < penalty_radius:
                             reward -= proximity_penalty
 
                     speed_penalty = self._rl_config.get('SPEED_PENALTY', 0.0)
 
-                    #print(speed_penalty)
-                    #print(distance)
-                    #print("lin_speed" in observations)
                     if speed_penalty > 0.0 and \
                         distance < penalty_radius and \
                         "lin_speed" in observations:
                         lin_speed = abs(observations['lin_speed'])
-                        print("Speed penalty: ")
-                        print(speed_penalty * (penalty_radius-distance)/penalty_radius * lin_speed)
-                        reward -= speed_penalty * (penalty_radius-distance)/penalty_radius * lin_speed
+                        speed_penalty_type = self._rl_config.get('SPEED_PENALTY_TYPE','lin')
+                        if speed_penalty_type == "lin":
+                            reward -= speed_penalty * (penalty_radius-distance)/penalty_radius * lin_speed
+                        else:
+                            if distance < 0.5 and lin_speed > 0.1:
+                                reward -= speed_penalty
+                            if distance < 1.2 and lin_speed > 0.15:
+                                reward -= speed_penalty
+                            if distance < 3.6 and lin_speed > 0.20:
+                                reward -= speed_penalty
 
         self._previous_measure = current_measure
 
