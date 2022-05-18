@@ -177,11 +177,20 @@ class PPOTrainer(BaseRLTrainer):
                     'pointgoal_with_gps_compass': self.envs.observation_spaces[0].spaces['pointgoal_with_gps_compass']
                 }
             )
-        else:
+        elif 'pointgoal_with_gps_compass' in self.envs.observation_spaces[0].spaces:
             observation_space = Dict(
                 {
                     'depth': self.envs.observation_spaces[0].spaces['depth'],
                     'pointgoal_with_gps_compass': self.envs.observation_spaces[0].spaces['pointgoal_with_gps_compass']
+                }
+            )
+        else:
+            observation_space = Dict(
+                {
+                    'depth': self.envs.observation_spaces[0].spaces['depth'],
+                    'pointgoal':
+                        self.envs.observation_spaces[0].spaces[
+                            'pointgoal']
                 }
             )
         self.actor_critic = policy.from_config(
