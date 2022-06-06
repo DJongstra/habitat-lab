@@ -117,6 +117,14 @@ class NavRLEnv(habitat.RLEnv):
                         speed_penalty_type = self._rl_config.get('SPEED_PENALTY_TYPE','lin')
                         if speed_penalty_type == "lin":
                             reward -= speed_penalty * (penalty_radius-distance)/penalty_radius * lin_speed
+                        elif speed_penalty_type == "bnd":
+                            bound_value = self._rl_config.get('SPEED_PENALTY_BOUND',0.07)
+                            print("here")
+                            print(distance)
+                            print(lin_speed)
+                            print(lin_speed/distance)
+                            if lin_speed/distance > bound_value:
+                                closest_human_zone = 1  #   the speed is too high for the distance, so give the specified speed penalty
                         else:
                             print(distance)
                             if distance < 0.5 and lin_speed > 0.1:
@@ -129,7 +137,7 @@ class NavRLEnv(habitat.RLEnv):
                                 if closest_human_zone < 1:
                                     closest_human_zone = 1
 
-                reward -= speed_penalty * closest_human_zone
+                reward -= speed_penalty * closest_human_zone    # actually giving speed penalty
 
         self._previous_measure = current_measure
 
