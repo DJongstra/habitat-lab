@@ -87,7 +87,13 @@ ADD habitat_baselines/config/pointnav/ddppo_pointnav_social-novid.yaml /habitat-
 
 # Add configs for scenarios
 ADD configs/tasks/socialnav-scenario.yaml /habitat-lab/configs/tasks/
-ADD scenarios/datasets /habitat-lab/scenarios/datasets
+ADD scenarios/ /habitat-lab/scenarios/
+
+# Add config for the local mimimun, without GPS
+ADD configs/tasks/socialnav-scenario-localmin.yaml /habitat-lab/configs/tasks/
+
+# Add pretrained pth's
+ADD pretrained/ /habitat-lab/pretrained/
 
 # Add experiment scripts.
 ADD train.sh /

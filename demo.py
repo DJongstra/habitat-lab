@@ -40,7 +40,15 @@ def display_sample(rgb_obs):
 forward_action = {
     "action":"VELOCITY_CONTROL",
     "action_args": {
-        "lin_vel":0.25,
+        "lin_vel":1.0,
+        "ang_vel":0.0,
+        "allow_sliding":True
+    }
+}
+forward_action2 = {
+    "action":"VELOCITY_CONTROL",
+    "action_args": {
+        "lin_vel":0.10,
         "ang_vel":0.0,
         "allow_sliding":True
     }
@@ -110,22 +118,30 @@ for i in range(len(env.episodes)):
             action = left_action
         elif k == ord("d"):
             action = right_action
+        elif k == ord("e"):
+            action = forward_action2
         elif k == ord(" "):
             action = none_action
         elif k == ord("q"):
             exit(0)
         elif k == ord("t"):
-            break
+            env._env.task.is_stop_called = True
+            action = none_action
+            print("stop called")
         else:
             action = none_action
 
-        observations, _, _, info = env.step(action=action)
-        reward = env.get_reward(observations)
+        observations, reward, done, info = env.step(action=action)
+        #reward = env.get_reward(observations)
         print("reward:  ", reward)
         count_steps += 1
-
+        print("distance_to_goal: ", info["distance_to_goal"])
+        print("success: ", info["success"])
+        print("Speed: ", observations["lin_speed"])
+        print("ACCEL:", observations["lin_accel"])
+        #print(observations)
         agent_state = env._env._sim.get_agent_state()
-        print("position: ", agent_state.position)
+        # print("position: ", agent_state.position)
         print(len(env.habitat_env.sim.people))
         for person in env.habitat_env.sim.people:
             print(person.object_id, person.current_position)

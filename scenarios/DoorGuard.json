@@ -1,6 +1,6 @@
 { 
   "comment": "scene is room3x3, which is a square room with the lower left corner at (-15,-15) and upper right corner at (15,15)",
-  "data_path": "./scenarios/datasets/hall/{split}/{split}.json.gz",
+  "data_path": "./scenarios/datasets/hall2/{split}/{split}.json.gz",
   "objects": [
   ],
   "people": [

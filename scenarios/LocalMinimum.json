@@ -1,0 +1,43 @@
+{ 
+  "comment": "scene is room3x3, which is a square room with the lower left corner at (-15,-15) and upper right corner at (15,15)",
+  "data_path": "./scenarios/datasets/hall3/{split}/{split}.json.gz",
+  "objects": [
+  ],
+  "people": [
+    {
+      "start": [-0.6,5.5],
+      "end": [-0.6,5.5],
+      "lin_speed": 0,
+      "ang_speed": 0
+    },
+    {
+      "start": [-0.3,6],
+      "end": [-0.3,6],
+      "lin_speed": 0,
+      "ang_speed": 0
+    },
+    {
+      "start": [0.6,5.5],
+      "end": [0.6,5.5],
+      "lin_speed": 0,
+      "ang_speed": 0
+    },
+    {
+      "start": [0.3,6],
+      "end": [0.3,6],
+      "lin_speed": 0,
+      "ang_speed": 0
+    }
+  ],
+  "walls": [
+    {
+      "start": [-2,15],
+      "end": [-2,-15]
+    },
+    {
+      "start": [2,15],
+      "end": [2,-15]
+    }
+  ]
+}
+

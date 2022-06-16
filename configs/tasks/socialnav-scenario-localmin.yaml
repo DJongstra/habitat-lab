@@ -1,0 +1,43 @@
+ENVIRONMENT:
+  MAX_EPISODE_STEPS: 500
+SIMULATOR:
+  TYPE: "iGibsonSocialNav"
+  AGENT_0:
+    SENSORS: ['RGB_SENSOR', 'DEPTH_SENSOR']
+  HABITAT_SIM_V0:
+    GPU_DEVICE_ID: 0
+    ALLOW_SLIDING: True # True or False, enables the robot to move by sliding alongside a wall
+  RGB_SENSOR:
+    WIDTH: 256
+    HEIGHT: 256
+  DEPTH_SENSOR:
+    WIDTH: 256
+    HEIGHT: 256
+  NUM_PEOPLE: 0 # set to 1 or more to generate people in scene
+  NUM_OBJECTS: 0
+  PEOPLE_LIN_SPEED: 0.0 # both people speeds need to be set to zero to have a non-moving human
+  PEOPLE_ANG_SPEED: 0.0
+  TIME_STEP: 1.0
+  FORCE_AROUND_PATH: False
+  SCENARIO: "./scenarios/LocalMinimum.json"
+TASK:
+  TYPE: SocialNav-v0
+  SUCCESS_DISTANCE: 0.2
+
+  SENSORS: ['POINTGOAL_SENSOR']
+  POINTGOAL_SENSOR:
+    GOAL_FORMAT: "POLAR"
+    DIMENSIONALITY: 2
+  GOAL_SENSOR_UUID: pointgoal
+
+ # Adding the SOCIAL_TOP_DOWN_MAP measurement slows down training significantly
+  MEASUREMENTS: ['DISTANCE_TO_GOAL', 'SUCCESS', 'SPL', 'HUMAN_COLLISION', 'PEOPLE_POSITIONING', 'OBJECT_DISTANCE', 'COLLISIONS', 'PATH_IRREGULARITY', 'NUM_STEPS', 'CLOSEST_DISTANCE_TO_GOAL']
+  SUCCESS:
+    SUCCESS_DISTANCE: 0.2
+
+  POSSIBLE_ACTIONS: ["VELOCITY_CONTROL"] # this is automatically set for gaussian action distribution in ppo_trainer.py when using gaussian action distribution. Needs to be set manually for using demo.py
+
+DATASET:
+  TYPE: PointNav-v1
+  SPLIT: train
+  DATA_PATH: data/datasets/pointnav/room3x3/v0/{split}/{split}.json.gz
